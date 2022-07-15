@@ -1,4 +1,4 @@
 # tradex
 
 
-Fetching data from the ctrader Open Api
+Fetching data from the ctrader Api
