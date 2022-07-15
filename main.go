@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
 )
 
@@ -15,8 +16,8 @@ func main() {
 
 	//Initialize the database
 	//path := "root:<abc>@tcp(localhost:3306)/test"
-	// path := "root:abc@tcp(127.0.0.1:3306)/test"
-	// database.Connect(path)
+	path := "root:abc@tcp(127.0.0.1:3306)/test"
+	database.Connect(path)
 	// //database.Connect(path)
 	// database.Migrate()
 
