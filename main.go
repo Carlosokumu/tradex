@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -16,10 +18,10 @@ func main() {
 
 	//Initialize the database
 	//path := "root:<abc>@tcp(localhost:3306)/test"
-	path := "root:abc@tcp(127.0.0.1:3306)/test"
-	database.Connect(path)
-	// //database.Connect(path)
-	// database.Migrate()
+	//path := "root:abc@tcp(127.0.0.1:3306)/test"
+	dsn := "host=localhost user=postgres password=Agent047 dbname=postgres port=2768 sslmode=disable TimeZone=Asia/Shanghai"
+	database.Connect(dsn)
+	database.Migrate()
 
 	//Create a client
 	client := &http.Client{}
@@ -54,6 +56,20 @@ func main() {
 	json.Unmarshal(bodyBytes, &responseObject)
 	fmt.Println(responseObject.Data[0].AccountID)
 	// fmt.Println(responseObject.AccountNumber)
+	router := initRouter()
+	router.Run(":8080")
 
 	fmt.Printf("API Response as struct %+v\n", responseObject)
+
+}
+
+func initRouter() *gin.Engine {
+	router := gin.Default()
+	api := router.Group("/tradex")
+	{
+
+		api.POST("/user/register", controllers.RegisterUser)
+
+	}
+	return router
 }
