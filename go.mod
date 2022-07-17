@@ -3,6 +3,7 @@ module github.com/carlosokumu/dubbedapi
 go 1.15
 
 require (
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/goccy/go-json v0.9.8 // indirect

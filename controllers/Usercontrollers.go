@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/ajg/form"
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/gin-gonic/gin"
@@ -10,14 +12,19 @@ import (
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
-	if err := context.ShouldBindJSON(&user); err != nil {
+	
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
 		context.Abort()
 		return
 	}
+
 	if err := user.HashPassword(user.Password); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
 		context.Abort()
+		log.Fatal(err)
 		return
 	}
 
@@ -27,7 +34,8 @@ func RegisterUser(context *gin.Context) {
 	if record.Error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
 		context.Abort()
+		log.Fatal(record.Error)
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username})
+	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastName": user.LastName, "email": user.Email, "username": user.Username})
 }
