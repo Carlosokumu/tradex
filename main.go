@@ -50,7 +50,8 @@ func main() {
 	// fmt.Println(responseObject.Data[0].AccountID)
 	// fmt.Println(responseObject.AccountNumber)
 	router := initRouter()
-	router.Run(os.Getenv("PORT"))
+	port := os.Getenv("PORT")
+	router.Run(port)
 
 	// fmt.Printf("API Response as struct %+v\n", responseObject)
 
