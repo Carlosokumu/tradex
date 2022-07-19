@@ -25,6 +25,6 @@ func PositionData(context *gin.Context) {
 		fmt.Println(parseError)
 	}
 
-	fmt.Println("Ctrader Sendind data")
+	fmt.Println("Ctrader Sendind data", responseObject[0].EntryPrice)
 	context.String(http.StatusOK, "Hellow")
 }
