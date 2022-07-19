@@ -28,7 +28,7 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-	//Create a new user record into the database
+	//Create a new user record into the databases
 
 	record := database.Instance.Create(&user)
 	if record.Error != nil {
