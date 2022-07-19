@@ -40,6 +40,6 @@ func RegisterUser(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastName": user.LastName, "email": user.Email, "username": user.Username})
 }
 
-func testApp(context *gin.Context) {
-
+func TestRouter(context *gin.Context) {
+	context.String(http.StatusOK, "Hellow")
 }
