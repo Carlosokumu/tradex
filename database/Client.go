@@ -23,6 +23,9 @@ func Connect(connectionString string) {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&models.User{})
+	err := Instance.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Println(err)
+	}
 	log.Println("Database Migration Completed!")
 }
