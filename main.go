@@ -51,7 +51,7 @@ func main() {
 	// fmt.Println(responseObject.AccountNumber)
 	router := initRouter()
 	port := os.Getenv("PORT")
-	router.Run(port)
+	router.Run(":" + port)
 
 	// fmt.Printf("API Response as struct %+v\n", responseObject)
 
