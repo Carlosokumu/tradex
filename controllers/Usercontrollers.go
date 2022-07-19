@@ -12,7 +12,7 @@ import (
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
-	
+
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
@@ -38,4 +38,8 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastName": user.LastName, "email": user.Email, "username": user.Username})
+}
+
+func testApp(context *gin.Context) {
+
 }
