@@ -8,6 +8,6 @@ import (
 )
 
 func PositionData(context *gin.Context) {
-	fmt.Println("Hitting by ctrader")
+	fmt.Println("Ctrader Sendind data")
 	context.String(http.StatusOK, "Hellow")
 }
