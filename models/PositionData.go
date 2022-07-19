@@ -1,5 +1,4 @@
-
-
+package models
 
 type PositionData struct {
 	AccountID                   int    `json:"accountId,omitempty"`
