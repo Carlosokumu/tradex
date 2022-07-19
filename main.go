@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/carlosokumu/dubbedapi/controllers"
-	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,9 +11,9 @@ func main() {
 
 	fmt.Println("Fetching data  from api")
 
-	dsn := "host=localhost user=postgres password=Agent047 dbname=postgres port=2768 sslmode=disable TimeZone=Asia/Shanghai"
-	database.Connect(dsn)
-	database.Migrate()
+	// dsn := "host=localhost user=postgres password=Agent047 dbname=postgres port=2768 sslmode=disable TimeZone=Asia/Shanghai"
+	// database.Connect(dsn)
+	// database.Migrate()
 
 	//Create a client
 	//client := &http.Client{}
