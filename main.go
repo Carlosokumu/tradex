@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/gin-gonic/gin"
@@ -49,7 +50,7 @@ func main() {
 	// fmt.Println(responseObject.Data[0].AccountID)
 	// fmt.Println(responseObject.AccountNumber)
 	router := initRouter()
-	router.Run(":8080")
+	router.Run(os.Getenv("PORT"))
 
 	// fmt.Printf("API Response as struct %+v\n", responseObject)
 
