@@ -51,7 +51,17 @@ func UpdateUser(context *gin.Context) {
 }
 
 func UpdatePhoneNumber(context *gin.Context) {
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "kalonje").Update("phone_number", "254705136690"); result.Error != nil {
+	var phoneinfo models.PhoneInfo
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&phoneinfo); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", phoneinfo.UserName).Update("phone_number", phoneinfo.PhoneNumber); result.Error != nil {
 		log.Fatal(result.Error)
 		fmt.Println("Cannot find User")
 	}
