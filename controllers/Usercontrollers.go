@@ -55,6 +55,14 @@ func UpdateUser(context *gin.Context) {
 	context.JSON(http.StatusOK, "Done")
 }
 
+func UpdatePhoneNumber(context *gin.Context) {
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "kalonje").Update("phonenumber", "254705136690"); result.Error != nil {
+		log.Fatal(result.Error)
+		fmt.Println("Cannot find User")
+	}
+	context.JSON(http.StatusOK, gin.H{"response": "Phone Number updated Sucessfully"})
+}
+
 func TestRouter(context *gin.Context) {
 	context.String(http.StatusOK, "Hellow")
 }

@@ -68,6 +68,7 @@ func initRouter() *gin.Engine {
 		api.GET("/test", controllers.TestRouter)
 		api.POST("/positiondata/add", controllers.PositionData)
 		api.PATCH("/user", controllers.UpdateUser)
+		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 	}
 	return router
 }
