@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -49,7 +50,7 @@ func UpdateUser(context *gin.Context) {
 	// database.Instance.Table("users").Save(&user)
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "carlo").Update("username", "webman"); result.Error != nil {
 		log.Fatal(result.Error)
-		// fmt.Println(user.LastName)
+		fmt.Println("Cannot find User")
 	}
 	context.JSON(http.StatusOK, "Done")
 }
