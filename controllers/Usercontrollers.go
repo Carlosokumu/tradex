@@ -48,7 +48,7 @@ func UpdateUser(context *gin.Context) {
 	// }
 	// user.Email = "coderokush@gmail.com"
 	// database.Instance.Table("users").Save(&user)
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "carlo").Update("username", "kalonje"); result.Error != nil {
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "webman").Update("username", "kalonje"); result.Error != nil {
 		log.Fatal(result.Error)
 		fmt.Println("Cannot find User")
 	}
