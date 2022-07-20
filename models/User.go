@@ -7,11 +7,12 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName string `form:"firstname"`
-	LastName  string `form:"lastname"`
-	Username  string `form:"username"`
-	Email     string `form:"email"`
-	Password  string `form:"password"`
+	FirstName   string `form:"firstname"`
+	LastName    string `form:"lastname"`
+	Username    string `form:"username"`
+	Email       string `form:"email"`
+	Password    string `form:"password"`
+	PhoneNumber string `form:"phoneNumber,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
