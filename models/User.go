@@ -12,7 +12,7 @@ type User struct {
 	Username    string `form:"username"`
 	Email       string `form:"email"`
 	Password    string `form:"password"`
-	PhoneNumber string `form:"phoneNumber,omitempty"`
+	PhoneNumber string `form:"phonenumber,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
