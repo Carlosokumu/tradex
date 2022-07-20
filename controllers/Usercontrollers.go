@@ -56,7 +56,7 @@ func UpdateUser(context *gin.Context) {
 }
 
 func UpdatePhoneNumber(context *gin.Context) {
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "kalonje").Update("phonenumber", "254705136690"); result.Error != nil {
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "kalonje").Update("phone_number", "254705136690"); result.Error != nil {
 		log.Fatal(result.Error)
 		fmt.Println("Cannot find User")
 	}
