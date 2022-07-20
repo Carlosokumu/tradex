@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -42,12 +41,17 @@ func RegisterUser(context *gin.Context) {
 }
 
 func UpdateUser(context *gin.Context) {
-	var user models.User
-	if result := database.Instance.Table("users").Where("username = ?", "carlos").First(&user); result.Error != nil {
-		log.Fatal(result)
+	//var user models.User
+	// if result := database.Instance.Table("users").Where("username = ?", "carlos").First(&user); result.Error != nil {
+	// 	log.Fatal(result)
+	// }
+	// user.Email = "coderokush@gmail.com"
+	// database.Instance.Table("users").Save(&user)
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "carlos").Update("username", "webman"); result.Error != nil {
+		log.Fatal(result.Error)
+		// fmt.Println(user.LastName)
 	}
-	fmt.Println(user.LastName)
-	context.JSON(http.StatusOK, user.FirstName)
+	context.JSON(http.StatusOK, "Done")
 }
 
 func TestRouter(context *gin.Context) {
