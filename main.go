@@ -66,7 +66,7 @@ func initRouter() *gin.Engine {
 
 		api.POST("/user/register", controllers.RegisterUser)
 		api.GET("/test", controllers.TestRouter)
-		api.POST("/positiondata/add", controllers.PositionData)
+		api.POST("/positiondata/add", controllers.InsertPositionData)
 		api.PATCH("/user", controllers.UpdateUser)
 		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 	}
