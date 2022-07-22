@@ -17,7 +17,7 @@ func PositionData(context *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	var responseObject []models.OpenPosition
+	var responseObject models.OpenPosition
 
 	parseError := json.Unmarshal(bodyBytes, &responseObject)
 
@@ -25,6 +25,6 @@ func PositionData(context *gin.Context) {
 		fmt.Println(parseError)
 	}
 
-	fmt.Println("Ctrader Sendind data", responseObject[0].EntryPrice)
+	fmt.Println("Ctrader Sendind data", responseObject.EntryPrice)
 	context.String(http.StatusOK, "Hellow")
 }
