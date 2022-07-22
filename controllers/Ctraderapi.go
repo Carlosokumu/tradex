@@ -54,6 +54,6 @@ func GetOpenPositions(context *gin.Context) {
 		log.Fatal(result)
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"openpositions": result})
+	context.JSON(http.StatusCreated, gin.H{"openpositions": openposition})
 
 }
