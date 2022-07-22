@@ -17,7 +17,7 @@ func PositionData(context *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	var responseObject []models.PositionData
+	var responseObject []models.OpenPosition
 
 	parseError := json.Unmarshal(bodyBytes, &responseObject)
 

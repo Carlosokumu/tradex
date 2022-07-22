@@ -23,7 +23,12 @@ func Connect(connectionString string) {
 }
 
 func Migrate() {
-	err := Instance.AutoMigrate(&models.User{})
+
+	err := Instance.AutoMigrate(
+		&models.User{},
+		&models.OpenPosition{},
+	)
+
 	if err != nil {
 		log.Println(err)
 	}
