@@ -50,10 +50,12 @@ func GetOpenPositions(context *gin.Context) {
 	var openposition []models.OpenPosition
 	result := database.Instance.Table("users").Find(&openposition)
 
+	fmt.Println(result.RowsAffected)
+
 	if result.Error != nil {
 		log.Fatal(result)
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"openpositions": openposition})
+	context.JSON(http.StatusOK, gin.H{"openpositions": openposition})
 
 }
