@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
+	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +25,15 @@ func PositionData(context *gin.Context) {
 
 	if parseError != nil {
 		fmt.Println(parseError)
+	}
+
+	record := database.Instance.Create(&responseObject)
+
+	if record.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+		context.Abort()
+		log.Fatal(record.Error)
+		return
 	}
 
 	fmt.Println("Ctrader Sendind data:Entry Price ", responseObject.EntryPrice)
