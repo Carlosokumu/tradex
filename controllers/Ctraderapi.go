@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PositionData(context *gin.Context) {
+func InsertPositionData(context *gin.Context) {
 
 	bodyBytes, err := ioutil.ReadAll(context.Request.Body)
 
@@ -43,4 +43,17 @@ func PositionData(context *gin.Context) {
 	fmt.Println("Ctrader Sendind data:Quantity", responseObject.Quantity)
 
 	context.String(http.StatusOK, "Hellow")
+}
+
+func GetOpenPositions(context *gin.Context) {
+
+	var openposition []models.OpenPosition
+	result := database.Instance.Table("users").Find(&openposition)
+
+	if result.Error != nil {
+		log.Fatal(result)
+	}
+
+	context.JSON(http.StatusCreated, gin.H{"openpositions": result})
+
 }
