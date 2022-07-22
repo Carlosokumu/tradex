@@ -48,7 +48,7 @@ func InsertPositionData(context *gin.Context) {
 func GetOpenPositions(context *gin.Context) {
 
 	var openposition []models.OpenPosition
-	result := database.Instance.Table("users").Find(&openposition)
+	result := database.Instance.Table("open_positions").Find(&openposition)
 
 	fmt.Println(result.RowsAffected)
 
