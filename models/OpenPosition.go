@@ -2,6 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
+//Struct will hold information about the various positions
 type OpenPosition struct {
 	gorm.Model
 	PositionId int     `json:"PositionId,omitempty"`
