@@ -38,7 +38,7 @@ func RegisterUser(context *gin.Context) {
 		log.Fatal(record.Error)
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastName": user.LastName, "email": user.Email, "username": user.Username})
+	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username})
 }
 
 func UpdateUser(context *gin.Context) {
