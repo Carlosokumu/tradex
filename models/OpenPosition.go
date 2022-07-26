@@ -10,4 +10,6 @@ type OpenPosition struct {
 	TradeType  string  `json:"TradeType,omitempty"`
 	Quantity   float32 `json:"Quantity,omitempty"`
 	EntryTime  string  `json:"EntryTime,omitempty"`
+	TakeProfit float32 `json:"TakeProfit,omitempty"`
+	StopLoss   float32 `json:"StopLoss,omitempty"`
 }
