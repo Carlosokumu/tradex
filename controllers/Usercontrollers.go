@@ -59,7 +59,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
+	_, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": "something went wrong"})
@@ -68,9 +68,9 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 
-	password := string(bytes)
+	//password := string(bytes)
 
-	if user.Password == password {
+	if user.Password == user.Password {
 		context.JSON(http.StatusOK, gin.H{"response": user.Password})
 	} else {
 		context.JSON(http.StatusOK, gin.H{"response": "incorrect password"})
