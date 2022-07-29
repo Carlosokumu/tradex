@@ -55,6 +55,8 @@ func LoginUser(context *gin.Context) {
 	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"Http404": result})
 		fmt.Println(result)
+		context.Abort()
+		return
 	}
 	context.JSON(http.StatusOK, gin.H{"response": user.FirstName})
 }
