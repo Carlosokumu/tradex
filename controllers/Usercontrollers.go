@@ -9,6 +9,7 @@ import (
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterUser(context *gin.Context) {
@@ -58,7 +59,21 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"response": user.Password})
+	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
+
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": "something went wrong"})
+		fmt.Println(err)
+		context.Abort()
+		return
+	}
+
+	password := string(bytes)
+
+	if user.Password == password {
+		context.JSON(http.StatusOK, gin.H{"response": user.Password})
+	}
+
 }
 
 func UpdateUser(context *gin.Context) {
