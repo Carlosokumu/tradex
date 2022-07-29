@@ -58,7 +58,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"response": user.FirstName})
+	context.JSON(http.StatusOK, gin.H{"response": user.Password})
 }
 
 func UpdateUser(context *gin.Context) {
