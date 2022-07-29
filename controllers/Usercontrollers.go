@@ -61,7 +61,7 @@ func LoginUser(context *gin.Context) {
 	}
 	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
 
-	result := CheckPasswordHash(credentials.UserName, user.Password)
+	result := CheckPasswordHash(credentials.Password, user.Password)
 	fmt.Println("match", result)
 
 	if err != nil {
