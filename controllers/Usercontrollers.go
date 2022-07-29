@@ -72,6 +72,8 @@ func LoginUser(context *gin.Context) {
 
 	if user.Password == password {
 		context.JSON(http.StatusOK, gin.H{"response": user.Password})
+	} else {
+		context.JSON(http.StatusOK, gin.H{"response": "incorrect password"})
 	}
 
 }
