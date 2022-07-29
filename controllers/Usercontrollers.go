@@ -61,6 +61,9 @@ func LoginUser(context *gin.Context) {
 	}
 	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
 
+	result := CheckPasswordHash(credentials.UserName, user.Password)
+	fmt.Println("match", result)
+
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": "something went wrong"})
 		fmt.Println(err)
@@ -109,4 +112,9 @@ func UpdatePhoneNumber(context *gin.Context) {
 
 func TestRouter(context *gin.Context) {
 	context.String(http.StatusOK, "Hellow")
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
