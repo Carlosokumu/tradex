@@ -41,6 +41,23 @@ func RegisterUser(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username})
 }
 
+func LoginUser(context *gin.Context) {
+	var credentials models.Credentials
+	var user models.User
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&credentials); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
+		fmt.Println(result)
+	}
+	context.JSON(http.StatusOK, gin.H{"response": user.FirstName})
+}
+
 func UpdateUser(context *gin.Context) {
 
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "webman").Update("username", "kalonje"); result.Error != nil {
