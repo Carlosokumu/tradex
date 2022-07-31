@@ -54,7 +54,7 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": "username does not exist"})
+		context.JSON(http.StatusNotFound, gin.H{"response": result})
 		fmt.Println(result)
 		context.Abort()
 		return
@@ -78,7 +78,7 @@ func LoginUser(context *gin.Context) {
 	fmt.Println(password)
 
 	if result {
-		context.JSON(http.StatusOK, gin.H{"response": user.Password})
+		context.JSON(http.StatusOK, gin.H{"response": "success"})
 	} else {
 		context.JSON(http.StatusForbidden, gin.H{"response": "incorrect password"})
 	}
