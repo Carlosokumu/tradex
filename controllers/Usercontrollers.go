@@ -77,10 +77,10 @@ func LoginUser(context *gin.Context) {
 
 	fmt.Println(password)
 
-	if user.Password == user.Password {
+	if result {
 		context.JSON(http.StatusOK, gin.H{"response": user.Password})
 	} else {
-		context.JSON(http.StatusOK, gin.H{"response": "incorrect password"})
+		context.JSON(http.StatusForbidden, gin.H{"response": "incorrect password"})
 	}
 
 }
