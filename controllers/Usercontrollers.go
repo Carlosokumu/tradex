@@ -54,7 +54,7 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": result})
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
 		return
