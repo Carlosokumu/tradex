@@ -1,10 +1,8 @@
 package models
 
 import (
-	"net/smtp"
-	"os"
-
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/gomail.v2"
 	"gorm.io/gorm"
 )
 
@@ -36,25 +34,40 @@ func (user *User) CheckPassword(providedPassword string) error {
 }
 
 func (user *User) SendMail() {
-	from := "carlosokumu254@gmail.com"
+	//from := "carlosokumu254@gmail.com"
 	password := "hulisbfeulyecjpc"
 
-	toEmailAddress := "coderokush@gmail.com"
-	to := []string{toEmailAddress}
+	//toEmailAddress := "coderokush@gmail.com"
+	//to := []string{toEmailAddress}
 
 	host := "smtp.gmail.com"
 	//port := "587"
-	port := os.Getenv("MAILPORT")
-	address := host + ":" + port
+	//port := os.Getenv("MAILPORT")
+	//address := host + ":" + port
 
-	subject := "Subject: This is the subject of the mail\n"
-	body := "This is the body of the mail"
-	message := []byte(subject + body)
+	// subject := "Subject: This is the subject of the mail\n"
+	// //body := "This is the body of the mail"
+	// mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	// body := "<html><body><img src= "httpa" + "://i.pinimg.com/originals/aa/19/47/aa1947e08757e6a7d17724677ac850e6.jpg" alt="My image" /></body></html>"
+	// message := []byte(subject + mime + body)
 
-	auth := smtp.PlainAuth("", from, password, host)
+	// auth := smtp.PlainAuth("", from, password, host)
 
-	err := smtp.SendMail(address, auth, from, to, message)
-	if err != nil {
+	// err := smtp.SendMail(address, auth, from, to, message)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", "carlosokumu254@gmail.com")
+	m.SetHeader("To", "coderokush@gmail.com")
+	m.SetHeader("Subject", "Hello!")
+	m.Embed("image.png")
+	m.SetBody("text/html", `<img src="cid:image.png" alt="My image" />`)
+
+	d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
+
+	if err := d.DialAndSend(m); err != nil {
 		panic(err)
 	}
 }
