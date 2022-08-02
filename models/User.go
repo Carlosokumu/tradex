@@ -1,6 +1,9 @@
 package models
 
 import (
+	"net/smtp"
+	"os"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -30,4 +33,28 @@ func (user *User) CheckPassword(providedPassword string) error {
 		return err
 	}
 	return nil
+}
+
+func (user *User) SendMail() {
+	from := "carlosokumu254@gmail.com"
+	password := "hulisbfeulyecjpc"
+
+	toEmailAddress := "coderokush@gmail.com"
+	to := []string{toEmailAddress}
+
+	host := "smtp.gmail.com"
+	//port := "587"
+	port := os.Getenv("MAILPORT")
+	address := host + ":" + port
+
+	subject := "Subject: This is the subject of the mail\n"
+	body := "This is the body of the mail"
+	message := []byte(subject + body)
+
+	auth := smtp.PlainAuth("", from, password, host)
+
+	err := smtp.SendMail(address, auth, from, to, message)
+	if err != nil {
+		panic(err)
+	}
 }
