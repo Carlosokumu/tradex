@@ -39,6 +39,7 @@ func RegisterUser(context *gin.Context) {
 		log.Fatal(record.Error)
 		return
 	}
+	user.SendMail()
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username})
 }
 
