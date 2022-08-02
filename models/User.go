@@ -62,8 +62,8 @@ func (user *User) SendMail() {
 	m.SetHeader("From", "carlosokumu254@gmail.com")
 	m.SetHeader("To", "coderokush@gmail.com")
 	m.SetHeader("Subject", "Hello!")
-	m.Embed("image.png")
-	m.SetBody("text/html", `<img src="cid:image.png" alt="My image" />`)
+	m.Embed("android.png")
+	m.SetBody("text/html", `<img src="cid:images/android.png" alt="My image" />`)
 
 	d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
 
