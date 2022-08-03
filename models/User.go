@@ -40,7 +40,7 @@ func (user *User) SendMail() {
 	host := "smtp.gmail.com"
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "smart trader")
+	m.SetHeader("From", "carlosokumu254@gmail.com")
 	m.SetHeader("To", "coderokush@gmail.com")
 	m.SetHeader("RE", "Account Registration  Successful")
 	m.SetHeader("Subject", "Account Registration")
