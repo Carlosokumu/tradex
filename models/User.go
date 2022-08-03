@@ -43,7 +43,7 @@ func (user *User) SendMail() {
 	m.SetHeader("From", "carlosokumu254@gmail.com")
 	m.SetHeader("To", "coderokush@gmail.com")
 	m.SetHeader("Subject", "Hello!")
-	m.SetBody("text/html", `<img src="https://i.pinimg.com/originals/aa/19/47/aa1947e08757e6a7d17724677ac850e6.jpg" alt="My image" />`)
+	m.SetBody("text/html", ` <u> Registration confirmation</u> <br> RE: Account Registration  Successful </br> <br>Welcome to smartrader</br> <br> <img src="https://i.pinimg.com/originals/aa/19/47/aa1947e08757e6a7d17724677ac850e6.jpg" alt="My image" /> </br>" `)
 
 	d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
 
