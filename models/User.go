@@ -62,13 +62,12 @@ func (user *User) SendMail() {
 	<br> 
 	<p style = "margin-top: 1cm"> Download our app here</p>
 	<br>
-	<a href="https://www.qries.com/"
-	<img alt="Qries" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png"
-	width=150" height="70"></a>
+	<a href="https://www.qries.com/" <img alt="Qries" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png"
+	width=150" height="70"/></a>
 	<br>
-	You can view your account here 
+	<p>You can view your account here</p>
 	<br> 
-	<a href = "url">https:linktoplaystore</a> 
+	<a href = "url">https:linktoa/c.com</a> 
 	`)
 
 	d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
