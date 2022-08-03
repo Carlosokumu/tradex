@@ -52,7 +52,7 @@ func (user *User) SendMail() {
 	<br>
 	<h1 style = "margin-top: 1cm"> RE: Account Registration sucessful</h1> 
 	<br> 
-	<img style = "margin-top: 1cm" src="https://github.com/Carlosokumu/tradex/blob/master/images/logo.png" alt="My image" width="150" height="70" />
+	<img style = "margin-top: 1cm" src="images/logo.png" alt="My image" width="150" height="70" />
 	<br> 
 	<p> Hi carlos</p>
 	<br> 
