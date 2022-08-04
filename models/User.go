@@ -59,7 +59,7 @@ func (user *User) SendMail() {
 
 	headers := "MIME-version : 1.0;\nContent-Type: text/html;"
 
-	body.Write([]byte(fmt.Sprintf("Subject:yourSubject\n%s\n\n", headers)))
+	body.Write([]byte(fmt.Sprintf("Subject:Account Registration\n%s\n\n", headers)))
 
 	t.Execute(&body, struct {
 		Name string
