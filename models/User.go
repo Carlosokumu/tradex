@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/smtp"
+	"os"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -48,7 +49,8 @@ func (user *User) SendMail() {
 
 	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", password, host)
 
-	t, err := template.ParseFiles("/html/registration.html")
+	t, err := template.ParseFiles("registration.html")
+	address := host + ":" + os.Getenv("MAILPORT")
 
 	if err != nil {
 		panic(err)
@@ -69,7 +71,7 @@ func (user *User) SendMail() {
 		Message: "Hello",
 	})
 
-	senderr := smtp.SendMail(host, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
