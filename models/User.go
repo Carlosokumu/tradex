@@ -62,13 +62,9 @@ func (user *User) SendMail() {
 	body.Write([]byte(fmt.Sprintf("Subject:yourSubject\n%s\n\n", headers)))
 
 	t.Execute(&body, struct {
-		Name    string
-		Email   string
-		Message string
+		Name string
 	}{
-		Name:    "Carlos",
-		Email:   "carlosokumu254@gmail.com",
-		Message: "Hello",
+		Name: "Carlos",
 	})
 
 	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
