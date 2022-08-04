@@ -48,7 +48,7 @@ func InsertPositionData(context *gin.Context) {
 }
 
 func GetOpenPositions(context *gin.Context) {
-
+	var user models.User
 	var openposition []models.OpenPosition
 	result := database.Instance.Table("open_positions").Find(&openposition)
 
@@ -57,7 +57,7 @@ func GetOpenPositions(context *gin.Context) {
 	if result.Error != nil {
 		log.Fatal(result)
 	}
-
+	user.SendMail()
 	context.JSON(http.StatusOK, gin.H{"openpositions": openposition})
 
 }

@@ -1,8 +1,13 @@
 package models
 
 import (
+	"bytes"
+	"fmt"
+	"html/template"
+	"log"
+	"net/smtp"
+
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/gomail.v2"
 	"gorm.io/gorm"
 )
 
@@ -39,39 +44,71 @@ func (user *User) SendMail() {
 
 	host := "smtp.gmail.com"
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", "carlosokumu254@gmail.com")
-	m.SetHeader("To", "coderokush@gmail.com")
-	m.SetHeader("RE", "Account Registration  Successful")
-	m.SetHeader("Subject", "Account Registration")
-	m.SetBody("text/html",
-		`
-	<center>
-	<u>Registration confirmation</u>
-	</center>
-	<br>
-	<h1 style = "margin-top: 1cm"> RE: Account Registration sucessful</h1> 
-	<br> 
-	<img style = "margin-top: 1cm" src="images/logo.png" alt="My image" width="150" height="70" />
-	<br> 
-	<p> Hi carlos</p>
-	<br> 
-	<p> Thank you for joining smartrader Community</p>
-	<br>
-	<p>It is recommended you take enough time to read through the terms and conditions before making any deposits</p>
-	<br> 
-	<p style = "margin-top: 1cm"> Download our app here</p>
-	<br>
-	<a href="https://www.qries.com/"> <img alt="Qries" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png" width=150" height="70"></a>
-	<br>
-	<p>You can view your account here</p>
-	<br> 
-	<a href = "url">https:linktoaccount.com</a> 
-	`)
+	// Configure hermes by setting a theme and your product info
 
-	d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
+	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", password, host)
 
-	if err := d.DialAndSend(m); err != nil {
+	t, err := template.ParseFiles("/html/registration.html")
+
+	if err != nil {
 		panic(err)
 	}
+	var body bytes.Buffer
+
+	headers := "MIME-version : 1.0;\nContent-Type: text/html;"
+
+	body.Write([]byte(fmt.Sprintf("Subject:yourSubject\n%s\n\n", headers)))
+
+	t.Execute(&body, struct {
+		Name    string
+		Email   string
+		Message string
+	}{
+		Name:    "Carlos",
+		Email:   "carlosokumu254@gmail.com",
+		Message: "Hello",
+	})
+
+	senderr := smtp.SendMail(host, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
+
+	if senderr != nil {
+		log.Fatal(senderr)
+	}
+
+	// m := gomail.NewMessage()
+	// m.SetHeader("From", "carlosokumu254@gmail.com")
+	// m.SetHeader("To", "coderokush@gmail.com")
+	// m.SetHeader("RE", "Account Registration  Successful")
+	// m.SetHeader("Subject", "Account Registration")
+	// m.SetBody("text/html",emailBody)
+	// m.SetBody("text/html",
+	// 	`
+	// <center>
+	// <u>Registration confirmation</u>
+	// </center>
+	// <br>
+	// <h2 style = "margin-top: 1cm"> RE: Account Registration sucessful</h2>
+	// <br>
+	// <img style = "margin-top: 1cm" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png" alt="My image" width="150" height="70" />
+	// <br>
+	// <p> Hi <var>username</var></p>
+	// <br>
+	// <p> Thank you for joining smart trader Community</p>
+	// <br>
+	// <p>It is recommended  you take enough time to read through the terms and conditions before making any deposits</p>
+	// <br>
+	// <p style = "margin-top: 1cm"> Download our app here</p>
+	// <br>
+	// <a href="https://www.qries.com/"> <img alt="Qries" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png" width=150" height="70"></a>
+	// <br>
+	// <p>You can view your account here</p>
+	// <br>
+	// <a href = "url">https:linktoaccount.com</a>
+	// `)
+
+	// d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
+
+	// if err := d.DialAndSend(m); err != nil {
+	// 	panic(err)
+	// }
 }
