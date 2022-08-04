@@ -49,7 +49,7 @@ func (user *User) SendMail() {
 
 	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", password, host)
 
-	t, err := template.ParseFiles("registration.html")
+	t, err := template.ParseFiles("html/registration.html")
 	address := host + ":" + os.Getenv("MAILPORT")
 
 	if err != nil {
