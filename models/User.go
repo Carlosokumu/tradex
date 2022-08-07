@@ -110,3 +110,37 @@ func (user *User) SendMail() {
 	// 	panic(err)
 	// }
 }
+
+func SendOtpCode() {
+
+}
+
+func getGmailAuth(filename string, emailBody interface{}) {
+	password := "hulisbfeulyecjpc"
+
+	host := "smtp.gmail.com"
+
+	// Configure hermes by setting a theme and your product info
+
+	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", password, host)
+
+	t, err := template.ParseFiles(filename)
+	address := host + ":" + os.Getenv("MAILPORT")
+
+	if err != nil {
+		panic(err)
+	}
+	var body bytes.Buffer
+
+	headers := "MIME-version : 1.0;\nContent-Type: text/html;"
+
+	body.Write([]byte(fmt.Sprintf("Subject:Account Registration\n%s\n\n", headers)))
+
+	t.Execute(&body, emailBody)
+
+	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
+
+	if senderr != nil {
+		log.Fatal(senderr)
+	}
+}
