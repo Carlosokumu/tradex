@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/smtp"
 	"os"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -112,7 +113,12 @@ func (user *User) SendMail() {
 }
 
 func SendOtpCode() {
-
+	code := GenerateCode()
+	getGmailAuth("html/otp.html", struct {
+		Code string
+	}{
+		Code: code[:6],
+	})
 }
 
 func getGmailAuth(filename string, emailBody interface{}) {
@@ -143,4 +149,8 @@ func getGmailAuth(filename string, emailBody interface{}) {
 	if senderr != nil {
 		log.Fatal(senderr)
 	}
+}
+
+func GenerateCode() string {
+	return time.Nanosecond.String()
 }
