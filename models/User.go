@@ -152,5 +152,5 @@ func getGmailAuth(filename string, emailBody interface{}) {
 }
 
 func GenerateCode() string {
-	return time.Nanosecond.String()
+	return fmt.Sprint(time.Now().Nanosecond())
 }
