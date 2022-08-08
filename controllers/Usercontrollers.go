@@ -121,3 +121,10 @@ func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+func SendOtp(context *gin.Context) {
+	var user models.User
+	code := user.SendOtpCode()
+	context.JSON(http.StatusOK, gin.H{"code": code})
+
+}

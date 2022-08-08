@@ -112,13 +112,14 @@ func (user *User) SendMail() {
 	// }
 }
 
-func SendOtpCode() {
+func (user *User) SendOtpCode() string {
 	code := GenerateCode()
 	getGmailAuth("html/otp.html", struct {
 		Code string
 	}{
 		Code: code[:6],
 	})
+	return code
 }
 
 func getGmailAuth(filename string, emailBody interface{}) {
