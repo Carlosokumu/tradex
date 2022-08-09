@@ -46,8 +46,6 @@ func (user *User) SendMail() {
 
 	host := "smtp.gmail.com"
 
-	// Configure hermes by setting a theme and your product info
-
 	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", password, host)
 
 	t, err := template.ParseFiles("html/registration.html")
@@ -74,42 +72,6 @@ func (user *User) SendMail() {
 		log.Fatal(senderr)
 	}
 
-	// m := gomail.NewMessage()
-	// m.SetHeader("From", "carlosokumu254@gmail.com")
-	// m.SetHeader("To", "coderokush@gmail.com")
-	// m.SetHeader("RE", "Account Registration  Successful")
-	// m.SetHeader("Subject", "Account Registration")
-	// m.SetBody("text/html",emailBody)
-	// m.SetBody("text/html",
-	// 	`
-	// <center>
-	// <u>Registration confirmation</u>
-	// </center>
-	// <br>
-	// <h2 style = "margin-top: 1cm"> RE: Account Registration sucessful</h2>
-	// <br>
-	// <img style = "margin-top: 1cm" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png" alt="My image" width="150" height="70" />
-	// <br>
-	// <p> Hi <var>username</var></p>
-	// <br>
-	// <p> Thank you for joining smart trader Community</p>
-	// <br>
-	// <p>It is recommended  you take enough time to read through the terms and conditions before making any deposits</p>
-	// <br>
-	// <p style = "margin-top: 1cm"> Download our app here</p>
-	// <br>
-	// <a href="https://www.qries.com/"> <img alt="Qries" src="https://www.freepnglogos.com/uploads/play-store-logo-png/play-store-logo-nisi-filters-australia-11.png" width=150" height="70"></a>
-	// <br>
-	// <p>You can view your account here</p>
-	// <br>
-	// <a href = "url">https:linktoaccount.com</a>
-	// `)
-
-	// d := gomail.NewPlainDialer(host, 587, "carlosokumu254@gmail.com", password)
-
-	// if err := d.DialAndSend(m); err != nil {
-	// 	panic(err)
-	// }
 }
 
 func (user *User) SendOtpCode() string {
