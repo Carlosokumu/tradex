@@ -125,6 +125,6 @@ func CheckPasswordHash(password, hash string) bool {
 func SendOtp(context *gin.Context) {
 	var user models.User
 	code := user.SendOtpCode()
-	context.JSON(http.StatusOK, gin.H{"code": code})
+	context.JSON(http.StatusOK, gin.H{"code": code[:6]})
 
 }
