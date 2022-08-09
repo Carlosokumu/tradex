@@ -124,7 +124,16 @@ func CheckPasswordHash(password, hash string) bool {
 
 func SendOtp(context *gin.Context) {
 	var user models.User
-	code := user.SendOtpCode()
+	var adressInfo models.AdressInfo
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&adressInfo); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	code := user.SendOtpCode(adressInfo.EmailAdress)
 	context.JSON(http.StatusOK, gin.H{"code": code[:6]})
 
 }

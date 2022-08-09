@@ -74,9 +74,9 @@ func (user *User) SendMail() {
 
 }
 
-func (user *User) SendOtpCode() string {
+func (user *User) SendOtpCode(email string) string {
 	code := GenerateCode()
-	getGmailAuth("html/otp.html", struct {
+	getGmailAuth(email, "html/otp.html", struct {
 		Code string
 	}{
 		Code: code[:6],
@@ -84,7 +84,7 @@ func (user *User) SendOtpCode() string {
 	return code
 }
 
-func getGmailAuth(filename string, emailBody interface{}) {
+func getGmailAuth(email, filename string, emailBody interface{}) {
 	password := "hulisbfeulyecjpc"
 
 	host := "smtp.gmail.com"
@@ -107,7 +107,7 @@ func getGmailAuth(filename string, emailBody interface{}) {
 
 	t.Execute(&body, emailBody)
 
-	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{"coderokush@gmail.com"}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
