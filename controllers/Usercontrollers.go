@@ -14,6 +14,7 @@ import (
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
+	var password string
 
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&user); err != nil {
@@ -22,6 +23,7 @@ func RegisterUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
+	password = user.Password
 
 	if err := user.HashPassword(user.Password); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
@@ -39,8 +41,8 @@ func RegisterUser(context *gin.Context) {
 		log.Fatal(record.Error)
 		return
 	}
-	user.SendMail()
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username})
+	//user.SendMail()
+	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username, "password": password})
 }
 
 func LoginUser(context *gin.Context) {
