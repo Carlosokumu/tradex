@@ -107,7 +107,11 @@ func getGmailAuth(email, filename string, emailBody interface{}) {
 
 	body.Write([]byte(fmt.Sprintf("Subject:Account Registration\n%s\n\n", headers)))
 
-	t.Execute(&body, emailBody)
+	Terr := t.Execute(&body, emailBody)
+
+	if Terr != nil {
+		log.Fatal(Terr)
+	}
 
 	senderr := smtp.SendMail(address, gmailAuth, "smarttraderkenya@gmail.com", []string{email}, body.Bytes())
 
