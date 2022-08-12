@@ -87,7 +87,7 @@ func (user *User) SendOtpCode(email string) string {
 
 func getGmailAuth(email, filename string, emailBody interface{}) {
 	//password := "hulisbfeulyecjpc"
-	smarttader := "gntgkspsfqmkwech"
+	smarttader := "jxkpndrkvjbceokd"
 
 	host := "smtp.gmail.com"
 
