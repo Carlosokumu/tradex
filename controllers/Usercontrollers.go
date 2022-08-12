@@ -115,8 +115,19 @@ func UpdatePhoneNumber(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"response": "Phone Number updated Sucessfully"})
 }
 
-func TestRouter(context *gin.Context) {
-	context.String(http.StatusOK, "Hellow")
+func SendConfirmEmail(context *gin.Context) {
+	var confirmData models.ConfirmationData
+	var user models.User
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&confirmData); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	user.SendMailConfirmation(&confirmData)
+	context.JSON(http.StatusOK, gin.H{"response": "Sucessfully sent mail"})
 }
 
 func CheckPasswordHash(password, hash string) bool {

@@ -65,13 +65,13 @@ func initRouter() *gin.Engine {
 	{
 
 		api.POST("/user/register", controllers.RegisterUser)
-		api.GET("/test", controllers.TestRouter)
 		api.POST("/positiondata/add", controllers.InsertPositionData)
 		api.PATCH("/user", controllers.UpdateUser)
 		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 		api.GET("/positions/all", controllers.GetOpenPositions)
 		api.POST("/user/login", controllers.LoginUser)
 		api.POST("/user/email", controllers.SendOtp)
+		api.POST("/user/confirmation", controllers.SendConfirmEmail)
 	}
 	return router
 }
