@@ -93,7 +93,7 @@ func getGmailAuth(email, filename string, emailBody interface{}) {
 
 	// Configure hermes by setting a theme and your product info
 
-	gmailAuth := smtp.PlainAuth("", "smarttraderkenya", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "smarttraderkenya@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles(filename)
 	address := host + ":" + os.Getenv("MAILPORT")
