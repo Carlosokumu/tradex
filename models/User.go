@@ -18,11 +18,11 @@ type User struct {
 	//FirstName   string `form:"firstname"`
 	FirstName   string   `gorm:"size:255;not null;unique" form:"firstname"`
 	LastName    string   `gorm:"size:255;not null;unique" form:"lastname"`
-	UserName    string   `gorm:"size:150;not null;unique" form:"username"`
+	Username    string   `gorm:"size:150;not null;unique" form:"username"`
 	Email       string   `gorm:"size:100;not null;unique" form:"email"`
 	Password    string   `gorm:"size:100;not null;unique" form:"password"`
 	PhoneNumber string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
-	Balance     *float32 `gorm:"default:0" form:"balance,omitempty"`
+	Balance     *float32 `gorm:"default:0" form:"balance"`
 
 	//LastName    string `form:"lastname"`
 	//Username    string `form:"username"`
