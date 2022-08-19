@@ -27,6 +27,7 @@ func Migrate() {
 	err := Instance.AutoMigrate(
 		&models.User{},
 		&models.OpenPosition{},
+		&models.Transactions{},
 	)
 
 	if err != nil {
