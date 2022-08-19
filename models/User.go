@@ -2,9 +2,12 @@ package models
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"net/smtp"
 	"os"
 	"time"
@@ -123,4 +126,43 @@ func getGmailAuth(email, filename string, emailBody interface{}) {
 
 func GenerateCode() string {
 	return fmt.Sprint(time.Now().Nanosecond())
+}
+
+func (user *User) GetMtAccountBalance() {
+	client := &http.Client{}
+
+	/**
+		    Fetch data from Mt4 api through nodejs sdk  provided.
+	        Will switch to RabbitMq to make responses  fast.
+	*/
+	req, err := http.NewRequest("GET", "https://mt4functions.herokuapp.com/account", nil)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//Set  headers to the requests
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+
+	//Use the client to make the requests with the given [configurations]
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	var mt4account Mt4Account
+
+	json.Unmarshal(bodyBytes, &mt4account)
+
+	fmt.Println(mt4account.Balance)
+
 }

@@ -6,12 +6,14 @@ import (
 
 	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/carlosokumu/dubbedapi/database"
+	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-
+	var user models.User
 	fmt.Println("Fetching data  from api")
+	user.GetMtAccountBalance()
 
 	// dsn := "host=localhost user=postgres password=Agent047 dbname=postgres port=2768 sslmode=disable TimeZone=Asia/Shanghai"
 	path := "postgres://lmbdoeimaxunbj:5aaf1d7c9fec6e330ec64a15059c8b7f66db09c2711e87cc0d56a4cffec03b0d@ec2-44-206-11-200.compute-1.amazonaws.com:5432/d99joi1q9b5r3t"
