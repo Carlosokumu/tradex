@@ -150,3 +150,7 @@ func SendOtp(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"code": code[:6]})
 
 }
+
+func HandleDeposit(context *gin.Context) {
+
+}
