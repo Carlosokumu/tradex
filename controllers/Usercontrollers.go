@@ -153,4 +153,18 @@ func SendOtp(context *gin.Context) {
 
 func HandleDeposit(context *gin.Context) {
 
+	var depositDetails models.DepositDetails
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&depositDetails); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", depositDetails.Amount); result.Error != nil {
+		log.Fatal(result.Error)
+		context.Abort()
+		fmt.Println("Cannot find User")
+	}
 }
