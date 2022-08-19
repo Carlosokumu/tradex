@@ -154,6 +154,7 @@ func SendOtp(context *gin.Context) {
 func HandleDeposit(context *gin.Context) {
 
 	var depositDetails models.DepositDetails
+	var user models.User
 
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&depositDetails); err != nil {
@@ -162,11 +163,20 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", depositDetails.Amount); result.Error != nil {
+
+	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&user).Error; result != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
+		fmt.Println(result)
+		context.Abort()
+		return
+	}
+
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", *user.Balance+depositDetails.Amount); result.Error != nil {
 		log.Fatal(result.Error)
 		context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
-	context.JSON(http.StatusCreated, gin.H{"response": "Amount deposited successfully"})
+
+	context.JSON(http.StatusCreated, gin.H{"response": *user.Balance})
 }
