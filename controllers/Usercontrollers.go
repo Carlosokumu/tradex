@@ -164,6 +164,7 @@ func HandleDeposit(context *gin.Context) {
 	}
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", depositDetails.Amount); result.Error != nil {
 		log.Fatal(result.Error)
+		context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
