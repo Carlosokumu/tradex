@@ -155,9 +155,19 @@ func HandleDeposit(context *gin.Context) {
 
 	var depositDetails models.DepositDetails
 	var user models.User
+	var transactions models.Transactions
 
+	//Handle decode for the user trying to deposit
 	d := form.NewDecoder(context.Request.Body)
+
 	if err := d.Decode(&depositDetails); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	//Handle decode for the main transactions table
+	if err := d.Decode(&transactions); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
 		log.Fatal(err)
 		context.Abort()
@@ -168,6 +178,14 @@ func HandleDeposit(context *gin.Context) {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
+		return
+	}
+	//Create a new record for each deposit done by the user to the transactions table
+	record := database.Instance.Create(&transactions)
+	if record.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+		context.Abort()
+		log.Fatal(record.Error)
 		return
 	}
 
