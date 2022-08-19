@@ -72,6 +72,7 @@ func initRouter() *gin.Engine {
 		api.POST("/user/login", controllers.LoginUser)
 		api.POST("/user/email", controllers.SendOtp)
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
+		api.POST("/user/deposit", controllers.HandleDeposit)
 	}
 	return router
 }

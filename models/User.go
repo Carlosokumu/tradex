@@ -15,7 +15,6 @@ import (
 
 type User struct {
 	gorm.Model
-	//FirstName   string `form:"firstname"`
 	FirstName   string   `gorm:"size:255;not null" form:"firstname"`
 	LastName    string   `gorm:"size:255;not null" form:"lastname"`
 	Username    string   `gorm:"size:150;not null;unique" form:"username"`
@@ -23,12 +22,6 @@ type User struct {
 	Password    string   `gorm:"size:100;not null;unique" form:"password"`
 	PhoneNumber string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
 	Balance     *float32 `gorm:"default:0" form:"balance"`
-
-	//LastName    string `form:"lastname"`
-	//Username    string `form:"username"`
-	//Email       string `form:"email"`
-	//Password    string `form:"password"`
-	//PhoneNumber string `form:"phonenumber,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
