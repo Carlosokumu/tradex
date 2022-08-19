@@ -17,7 +17,7 @@ type User struct {
 	gorm.Model
 	//FirstName   string `form:"firstname"`
 	FirstName   string   `gorm:"size:255;not null" form:"firstname"`
-	LastName    string   `gorm:"size:255;not null;unique" form:"lastname"`
+	LastName    string   `gorm:"size:255;not null" form:"lastname"`
 	Username    string   `gorm:"size:150;not null;unique" form:"username"`
 	Email       string   `gorm:"size:100;not null;unique" form:"email"`
 	Password    string   `gorm:"size:100;not null;unique" form:"password"`
