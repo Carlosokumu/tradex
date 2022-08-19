@@ -166,12 +166,10 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	//Handle decode for the main transactions table
-	if err := d.Decode(&transactions); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-		log.Fatal(err)
-		context.Abort()
-		return
+	transactions = models.Transactions{
+		DepositedBy: depositDetails.UserName,
+		PhoneNumber: depositDetails.PhoneNumber,
+		Amount:      depositDetails.Amount,
 	}
 
 	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&user).Error; result != nil {
