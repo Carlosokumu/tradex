@@ -56,7 +56,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Table("smarttrader_users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
+	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
@@ -108,7 +108,7 @@ func UpdatePhoneNumber(context *gin.Context) {
 		return
 	}
 
-	if result := database.Instance.Table("smarttrader_users").Model(&models.User{}).Where("username = ?", phoneinfo.UserName).Update("phone_number", phoneinfo.PhoneNumber); result.Error != nil {
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", phoneinfo.UserName).Update("phone_number", phoneinfo.PhoneNumber); result.Error != nil {
 		log.Fatal(result.Error)
 		fmt.Println("Cannot find User")
 	}

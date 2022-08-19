@@ -24,7 +24,7 @@ func Connect(connectionString string) {
 
 func Migrate() {
 
-	err := Instance.Table("smarttrader_users").AutoMigrate(
+	err := Instance.AutoMigrate(
 		&models.User{},
 		&models.OpenPosition{},
 	)
