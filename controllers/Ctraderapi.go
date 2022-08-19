@@ -50,7 +50,9 @@ func InsertPositionData(context *gin.Context) {
 func GetOpenPositions(context *gin.Context) {
 
 	var openposition []models.OpenPosition
+	var user models.User
 	result := database.Instance.Table("open_positions").Find(&openposition)
+	user.GetMtAccountBalance()
 
 	fmt.Println(result.RowsAffected)
 
