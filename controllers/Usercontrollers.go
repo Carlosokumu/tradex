@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -195,4 +197,43 @@ func HandleDeposit(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"response": *user.Balance})
+}
+
+func GetMtAccountBalance() {
+	client := &http.Client{}
+
+	/**
+		    Fetch data from Mt4 api through nodejs sdk  provided.
+	        Will switch to RabbitMq to make responses  fast.
+	*/
+	req, err := http.NewRequest("GET", "https://api.spotware.com/connect/tradingaccounts?access_token=Ct2rFyZKl7-tSXWgkXJxrScJYdMTR-sdrVc9AGDoTzw", nil)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//Set  headers to the requests
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+
+	//Use the client to make the requests with the given [configurations]
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	var mt4account models.Mt4Account
+
+	json.Unmarshal(bodyBytes, &mt4account)
+
+	fmt.Println(mt4account.Balance)
+
 }
