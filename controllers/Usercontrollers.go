@@ -206,7 +206,7 @@ func GetMtAccountBalance() {
 		    Fetch data from Mt4 api through nodejs sdk  provided.
 	        Will switch to RabbitMq to make responses  fast.
 	*/
-	req, err := http.NewRequest("GET", "https://api.spotware.com/connect/tradingaccounts?access_token=Ct2rFyZKl7-tSXWgkXJxrScJYdMTR-sdrVc9AGDoTzw", nil)
+	req, err := http.NewRequest("GET", "https://mt4functions.herokuapp.com/account", nil)
 
 	if err != nil {
 		fmt.Println(err)
