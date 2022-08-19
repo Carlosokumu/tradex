@@ -167,4 +167,5 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
+	context.JSON(http.StatusCreated, gin.H{"response": "Amount deposited successfully"})
 }
