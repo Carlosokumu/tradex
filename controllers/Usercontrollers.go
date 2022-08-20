@@ -211,7 +211,16 @@ func HandleDeposit(context *gin.Context) {
 	}
 	accountBalance := *mt4Balance
 	contributionUsd := *updatedUser.Balance / currentMarketPrice
-	contribution := (accountBalance / contributionUsd) * 100
+	contribution := (contributionUsd / accountBalance) * 100
+
+	//Update the user's contribution  after a sucessfull deposit.
+
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("percentage_contribution", contribution); result.Error != nil {
+		log.Fatal(result.Error)
+		context.JSON(http.StatusNotFound, gin.H{"Error": result.Error})
+		context.Abort()
+		fmt.Println("Cannot find User")
+	}
 
 	fmt.Println("USDVALUE:", contributionUsd)
 	context.JSON(http.StatusCreated, gin.H{"response": contribution})
