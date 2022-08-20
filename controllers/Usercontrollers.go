@@ -193,6 +193,16 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
+	//Create a percentage contribution to the currently available balance from mt4 balance
+	mt4Balance, err := user.GetMtAccountBalance()
 
-	context.JSON(http.StatusCreated, gin.H{"response": *user.Balance})
+	if err != nil {
+		log.Fatal(err)
+		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
+		context.Abort()
+	}
+	accountBalance := *mt4Balance
+	contribution := accountBalance / *user.Balance
+	fmt.Println(contribution)
+	context.JSON(http.StatusCreated, gin.H{"response": contribution})
 }

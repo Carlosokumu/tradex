@@ -18,13 +18,14 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName   string   `gorm:"size:255;not null" form:"firstname"`
-	LastName    string   `gorm:"size:255;not null" form:"lastname"`
-	Username    string   `gorm:"size:150;not null;unique" form:"username"`
-	Email       string   `gorm:"size:100;not null;unique" form:"email"`
-	Password    string   `gorm:"size:100;not null;unique" form:"password"`
-	PhoneNumber string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
-	Balance     *float32 `gorm:"default:0" form:"balance"`
+	FirstName              string   `gorm:"size:255;not null" form:"firstname"`
+	LastName               string   `gorm:"size:255;not null" form:"lastname"`
+	Username               string   `gorm:"size:150;not null;unique" form:"username"`
+	Email                  string   `gorm:"size:100;not null;unique" form:"email"`
+	Password               string   `gorm:"size:100;not null;unique" form:"password"`
+	PhoneNumber            string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
+	Balance                *float32 `gorm:"default:0" form:"balance"`
+	PercentageContribution *float32 `gorm:"default:0" form:"contribution,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
@@ -128,7 +129,7 @@ func GenerateCode() string {
 	return fmt.Sprint(time.Now().Nanosecond())
 }
 
-func (user *User) GetMtAccountBalance() {
+func (user *User) GetMtAccountBalance() (*float32, error) {
 	client := &http.Client{}
 
 	/**
@@ -139,6 +140,7 @@ func (user *User) GetMtAccountBalance() {
 
 	if err != nil {
 		fmt.Println(err)
+		return nil, err
 	}
 
 	//Set  headers to the requests
@@ -150,6 +152,7 @@ func (user *User) GetMtAccountBalance() {
 
 	if err != nil {
 		fmt.Print(err.Error())
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -158,11 +161,16 @@ func (user *User) GetMtAccountBalance() {
 
 	if err != nil {
 		fmt.Print(err.Error())
+		return nil, err
 	}
 	var mt4account Mt4Account
 
-	json.Unmarshal(bodyBytes, &mt4account)
+	err = json.Unmarshal(bodyBytes, &mt4account)
+
+	if err != nil {
+		return nil, err
+	}
 
 	fmt.Println(mt4account.Balance)
-
+	return &mt4account.Balance, nil
 }
