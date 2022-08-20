@@ -226,3 +226,10 @@ func HandleDeposit(context *gin.Context) {
 	fmt.Println("USDVALUE:", contributionUsd)
 	context.JSON(http.StatusCreated, gin.H{"response": contribution})
 }
+
+func GetUserInfo(context *gin.Context) {
+	var user models.User
+	username := context.Query("username")
+	database.Instance.Where("username = ?", username).First(&user)
+	context.JSON(http.StatusOK, gin.H{"user": user})
+}
