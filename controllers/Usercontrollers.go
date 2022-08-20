@@ -157,7 +157,7 @@ func HandleDeposit(context *gin.Context) {
 	var user models.User
 	var transactions models.Transactions
 	var updatedUser models.User
-	currentMarketPrice := 119.99
+	//currentMarketPrice := 119.99
 
 	//Handle decode for the user trying to deposit
 	d := form.NewDecoder(context.Request.Body)
@@ -202,17 +202,17 @@ func HandleDeposit(context *gin.Context) {
 		return
 	}
 	//Create a percentage contribution to the currently available balance from mt4 balance
-	// mt4Balance, err := user.GetMtAccountBalance()
+	mt4Balance, err := user.GetMtAccountBalance()
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	context.JSON(http.StatusNotExtended, gin.H{"Error": err})
-	// 	context.Abort()
-	// }
+	if err != nil {
+		log.Fatal(err)
+		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
+		context.Abort()
+	}
 	// accountBalance := *mt4Balance
 	// contributionUsd := *updatedUser.Balance / currentMarketPrice
 	// contribution := (accountBalance / contributionUsd) * 100
 
 	// fmt.Println(contribution)
-	context.JSON(http.StatusCreated, gin.H{"response": "hey"})
+	context.JSON(http.StatusCreated, gin.H{"response": mt4Balance})
 }
