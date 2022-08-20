@@ -235,6 +235,7 @@ func GetUserInfo(context *gin.Context) {
 		fmt.Println(err)
 		context.JSON(http.StatusNotFound, gin.H{"Error": err})
 		context.Abort()
+		return
 	}
 	context.JSON(http.StatusOK, gin.H{"user": user})
 }
