@@ -230,6 +230,11 @@ func HandleDeposit(context *gin.Context) {
 func GetUserInfo(context *gin.Context) {
 	var user models.User
 	username := context.Query("username")
-	database.Instance.Where("username = ?", username).First(&user)
+
+	if err := database.Instance.Where("username = ?", username).First(&user).Error; err != nil {
+		fmt.Println(err)
+		context.JSON(http.StatusNotFound, gin.H{"Error": err})
+		context.Abort()
+	}
 	context.JSON(http.StatusOK, gin.H{"user": user})
 }
