@@ -233,7 +233,7 @@ func GetUserInfo(context *gin.Context) {
 
 	if err := database.Instance.Where("username = ?", username).First(&user).Error; err != nil {
 		fmt.Println(err)
-		context.JSON(http.StatusNotFound, gin.H{"Error": err})
+		context.JSON(http.StatusNotFound, gin.H{"Error": err.Error()})
 		context.Abort()
 		return
 	}
