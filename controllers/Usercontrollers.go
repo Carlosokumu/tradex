@@ -213,6 +213,6 @@ func HandleDeposit(context *gin.Context) {
 	contributionUsd := *updatedUser.Balance / currentMarketPrice
 	contribution := (accountBalance / contributionUsd) * 100
 
-	// fmt.Println(contribution)
+	fmt.Println("USDVALUE:", contributionUsd)
 	context.JSON(http.StatusCreated, gin.H{"response": contribution})
 }
