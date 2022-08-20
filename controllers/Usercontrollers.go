@@ -202,17 +202,17 @@ func HandleDeposit(context *gin.Context) {
 		return
 	}
 	//Create a percentage contribution to the currently available balance from mt4 balance
-	mt4Balance, err := user.GetMtAccountBalance()
+	// mt4Balance, err := user.GetMtAccountBalance()
 
-	if err != nil {
-		log.Fatal(err)
-		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
-		context.Abort()
-	}
-	accountBalance := *mt4Balance
-	contributionUsd := *updatedUser.Balance / currentMarketPrice
-	contribution := (accountBalance / contributionUsd) * 100
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	context.JSON(http.StatusNotExtended, gin.H{"Error": err})
+	// 	context.Abort()
+	// }
+	// accountBalance := *mt4Balance
+	// contributionUsd := *updatedUser.Balance / currentMarketPrice
+	// contribution := (accountBalance / contributionUsd) * 100
 
-	fmt.Println(contribution)
-	context.JSON(http.StatusCreated, gin.H{"response": contribution})
+	// fmt.Println(contribution)
+	context.JSON(http.StatusCreated, gin.H{"response": "hey"})
 }
