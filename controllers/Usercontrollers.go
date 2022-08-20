@@ -157,6 +157,7 @@ func HandleDeposit(context *gin.Context) {
 	var user models.User
 	var transactions models.Transactions
 	var updatedUser models.User
+	currentMarketPrice := 119.99
 
 	//Handle decode for the user trying to deposit
 	d := form.NewDecoder(context.Request.Body)
@@ -209,7 +210,9 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 	}
 	accountBalance := *mt4Balance
-	contribution := accountBalance / *user.Balance
+	contributionUsd := *updatedUser.Balance / currentMarketPrice
+	contribution := (accountBalance / contributionUsd) * 100
+
 	fmt.Println(contribution)
-	context.JSON(http.StatusCreated, gin.H{"response": updatedUser.Balance})
+	context.JSON(http.StatusCreated, gin.H{"response": contribution})
 }

@@ -24,8 +24,8 @@ type User struct {
 	Email                  string   `gorm:"size:100;not null;unique" form:"email"`
 	Password               string   `gorm:"size:100;not null;unique" form:"password"`
 	PhoneNumber            string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
-	Balance                *float32 `gorm:"default:0" form:"balance"`
-	PercentageContribution *float32 `gorm:"default:0" form:"contribution,omitempty"`
+	Balance                *float64 `gorm:"default:0" form:"balance"`
+	PercentageContribution *float64 `gorm:"default:0" form:"contribution,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
@@ -129,7 +129,7 @@ func GenerateCode() string {
 	return fmt.Sprint(time.Now().Nanosecond())
 }
 
-func (user *User) GetMtAccountBalance() (*float32, error) {
+func (user *User) GetMtAccountBalance() (*float64, error) {
 	client := &http.Client{}
 
 	/**
