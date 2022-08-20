@@ -205,8 +205,8 @@ func HandleDeposit(context *gin.Context) {
 	mt4Balance, err := user.GetMtAccountBalance()
 
 	if err != nil {
-		log.Fatal("BALANCERRROR", err)
 		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
+		log.Fatal("BALANCERRROR", err)
 		context.Abort()
 	}
 	accountBalance := *mt4Balance
