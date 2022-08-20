@@ -209,10 +209,10 @@ func HandleDeposit(context *gin.Context) {
 		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
 		context.Abort()
 	}
-	// accountBalance := *mt4Balance
-	// contributionUsd := *updatedUser.Balance / currentMarketPrice
+	accountBalance := *mt4Balance
+	//contributionUsd := *updatedUser.Balance / currentMarketPrice
 	// contribution := (accountBalance / contributionUsd) * 100
 
 	// fmt.Println(contribution)
-	context.JSON(http.StatusCreated, gin.H{"response": mt4Balance})
+	context.JSON(http.StatusCreated, gin.H{"response": accountBalance})
 }
