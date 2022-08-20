@@ -156,6 +156,7 @@ func HandleDeposit(context *gin.Context) {
 	var depositDetails models.DepositDetails
 	var user models.User
 	var transactions models.Transactions
+	var updatedUser models.User
 
 	//Handle decode for the user trying to deposit
 	d := form.NewDecoder(context.Request.Body)
@@ -193,6 +194,12 @@ func HandleDeposit(context *gin.Context) {
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
+	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&updatedUser).Error; result != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
+		fmt.Println(result)
+		context.Abort()
+		return
+	}
 	//Create a percentage contribution to the currently available balance from mt4 balance
 	mt4Balance, err := user.GetMtAccountBalance()
 
@@ -204,5 +211,5 @@ func HandleDeposit(context *gin.Context) {
 	accountBalance := *mt4Balance
 	contribution := accountBalance / *user.Balance
 	fmt.Println(contribution)
-	context.JSON(http.StatusCreated, gin.H{"response": contribution})
+	context.JSON(http.StatusCreated, gin.H{"response": updatedUser.Balance})
 }
