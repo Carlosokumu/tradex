@@ -206,7 +206,7 @@ func HandleDeposit(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusLocked, gin.H{"Error": "Mt4 Paused"})
-		log.Fatal("BALANCERRROR", err)
+		//log.Fatal("BALANCERRROR", err)
 		context.Abort()
 	}
 	accountBalance := *mt4Balance
