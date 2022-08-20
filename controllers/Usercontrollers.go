@@ -205,7 +205,7 @@ func HandleDeposit(context *gin.Context) {
 	mt4Balance, err := user.GetMtAccountBalance()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("BALANCERRROR", err)
 		context.JSON(http.StatusNotExtended, gin.H{"Error": err})
 		context.Abort()
 	}
@@ -214,6 +214,7 @@ func HandleDeposit(context *gin.Context) {
 	contribution := (contributionUsd / accountBalance) * 100
 
 	//Update the user's contribution  after a sucessfull deposit.
+	fmt.Println("%CONTR", contribution)
 
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("percentage_contribution", contribution); result.Error != nil {
 		log.Fatal(result.Error)
