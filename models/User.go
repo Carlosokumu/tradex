@@ -131,7 +131,7 @@ func GenerateCode() string {
 	return fmt.Sprint(time.Now().Nanosecond())
 }
 
-func (user *User) GetMtAccountBalance() (*float64, error) {
+func (user *User) GetMtAccountBalance() (*Mt4Account, error) {
 	client := &http.Client{}
 
 	/**
@@ -174,5 +174,5 @@ func (user *User) GetMtAccountBalance() (*float64, error) {
 	}
 
 	fmt.Println(mt4account.Balance)
-	return &mt4account.Balance, nil
+	return &mt4account, nil
 }

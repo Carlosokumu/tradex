@@ -209,7 +209,7 @@ func HandleDeposit(context *gin.Context) {
 		//log.Fatal("BALANCERRROR", err)
 		context.Abort()
 	}
-	accountBalance := *mt4Balance
+	accountBalance := *&mt4Balance.Balance
 	contributionUsd := *updatedUser.Balance / currentMarketPrice
 	contribution := (contributionUsd / accountBalance) * 100
 
@@ -229,13 +229,43 @@ func HandleDeposit(context *gin.Context) {
 
 func GetUserInfo(context *gin.Context) {
 	var user models.User
+	var stagedUser models.User
 	username := context.Query("username")
 
+	mt4Account, err := user.GetMtAccountBalance()
+
+	if err != nil {
+		return
+	}
+	floatingprofit := mt4Account.Equity - mt4Account.Balance
 	if err := database.Instance.Where("username = ?", username).First(&user).Error; err != nil {
 		fmt.Println(err)
 		context.JSON(http.StatusNotFound, gin.H{"Error": err.Error()})
 		context.Abort()
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"user": user})
+	//divide the main accounts data into  data for an individual user
+	individualprofit := (*user.PercentageContribution / 100) * floatingprofit
+	individualaccountBalance := (*user.PercentageContribution / 100) * mt4Account.Balance
+	individualEquity := (*user.PercentageContribution / 100) * mt4Account.Equity
+
+	//Update the data in an individual user before feeding it to the user
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", username).Updates(models.User{
+		FloatingProfit: &individualprofit,
+		Balance:        &individualaccountBalance,
+		Equity:         &individualEquity,
+	}); result.Error != nil {
+		context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
+		context.Abort()
+		fmt.Println("Cannot find User")
+		return
+	}
+	if err := database.Instance.Where("username = ?", username).First(&stagedUser).Error; err != nil {
+		fmt.Println(err)
+		context.JSON(http.StatusNotFound, gin.H{"Error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"user": stagedUser})
 }
