@@ -26,6 +26,8 @@ type User struct {
 	PhoneNumber            string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
 	Balance                *float64 `gorm:"default:0" form:"balance"`
 	PercentageContribution *float64 `gorm:"default:0" form:"contribution,omitempty"`
+	FloatingProfit         *float64 `gorm:"default:0" form:"floatingprofit,omitempty"`
+	Equity                 *float64 `gorm:"default:0" form:"equity,omitempty"`
 }
 
 func (user *User) HashPassword(password string) error {
