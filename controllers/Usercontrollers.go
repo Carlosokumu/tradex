@@ -81,7 +81,7 @@ func LoginUser(context *gin.Context) {
 	fmt.Println(password)
 
 	if result {
-		context.JSON(http.StatusOK, gin.H{"response": "success"})
+		context.JSON(http.StatusOK, gin.H{"user": user})
 	} else {
 		context.JSON(http.StatusForbidden, gin.H{"response": "unmatch"})
 	}
