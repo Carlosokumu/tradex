@@ -42,7 +42,16 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "firstname": user.FirstName, "lastname": user.LastName, "email": user.Email, "username": user.Username, "password": password})
+	context.JSON(http.StatusCreated, gin.H{"user": models.User{
+		FirstName:              user.FirstName,
+		LastName:               user.LastName,
+		Password:               password,
+		Balance:                user.Balance,
+		Email:                  user.Email,
+		FloatingProfit:         user.FloatingProfit,
+		PhoneNumber:            user.PhoneNumber,
+		PercentageContribution: user.PercentageContribution,
+	}})
 }
 
 func LoginUser(context *gin.Context) {
