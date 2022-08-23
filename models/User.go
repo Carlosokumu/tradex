@@ -22,8 +22,8 @@ type User struct {
 	LastName               string   `gorm:"size:255;not null" form:"lastname"`
 	Username               string   `gorm:"size:150;not null;unique" form:"username"`
 	Email                  string   `gorm:"size:100;not null;unique" form:"email"`
-	Password               string   `gorm:"size:100;not null;unique" form:"password"`
-	PhoneNumber            string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
+	Password               string   `gorm:"size:100;not null" form:"password"`
+	PhoneNumber            string   `gorm:"size:50;not null" form:"phonenumber,omitempty"`
 	Balance                *float64 `gorm:"default:0" form:"balance"`
 	PercentageContribution *float64 `gorm:"default:0" form:"contribution,omitempty"`
 	FloatingProfit         *float64 `gorm:"default:0" form:"floatingprofit,omitempty"`
