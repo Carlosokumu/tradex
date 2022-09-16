@@ -18,6 +18,8 @@ func main() {
 	database.Connect(path)
 	database.Migrate()
 
+	
+
 	//Create a client
 	//client := &http.Client{}
 
@@ -61,6 +63,8 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	r.LoadHTMLGlob("html/**/*.html")
+
 	api := router.Group("/tradex")
 	{
 
@@ -74,6 +78,9 @@ func initRouter() *gin.Engine {
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
 		api.POST("/user/deposit", controllers.HandleDeposit)
 		api.GET("/user/userinfo", controllers.GetUserInfo)
+		r.GET("/rascamps", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
+		})
 	}
 	return router
 }
