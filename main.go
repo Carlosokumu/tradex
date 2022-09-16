@@ -63,7 +63,7 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
-	r.LoadHTMLGlob("html/**/*.html")
+	router.LoadHTMLGlob("html/**/*.html")
 
 	api := router.Group("/tradex")
 	{
