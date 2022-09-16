@@ -22,7 +22,7 @@ func main() {
 	
 
 	//Create a client
-	//client := &http.Client{}
+	//client := &http.Client{}s
 
 	// req, err := http.NewRequest("GET", "https://api.spotware.com/connect/tradingaccounts?access_token=Ct2rFyZKl7-tSXWgkXJxrScJYdMTR-sdrVc9AGDoTzw", nil)
 
