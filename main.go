@@ -64,6 +64,9 @@ func main() {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.LoadHTMLGlob("html/**/*.html")
+	router.GET("/rascamps", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
+	})
 
 	api := router.Group("/tradex")
 	{
@@ -78,9 +81,7 @@ func initRouter() *gin.Engine {
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
 		api.POST("/user/deposit", controllers.HandleDeposit)
 		api.GET("/user/userinfo", controllers.GetUserInfo)
-		api.GET("/rascamps", func(c *gin.Context) {
-			c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
-		})
+		
 	}
 	return router
 }
