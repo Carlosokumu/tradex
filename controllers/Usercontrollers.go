@@ -36,6 +36,7 @@ func RegisterUser(context *gin.Context) {
 
 	record := database.Instance.Create(&user)
 	if record.Error != nil {
+		Println("Database Error")
 		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
 		context.Abort()
 		//log.Fatal(record.Error)
