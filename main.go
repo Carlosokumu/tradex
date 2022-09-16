@@ -64,7 +64,7 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
-	router.LoadHTMLGlob("html/**/*.html")
+	router.LoadHTMLGlob("html/*")
 	router.GET("/rascamps", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
 	})
