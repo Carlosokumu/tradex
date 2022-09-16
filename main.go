@@ -57,7 +57,7 @@ func main() {
 	port := os.Getenv("PORT")
 	router.Run(":" + port)
 
-	// fmt.Printf("API Response as struct %+v\n", responseObject)
+	// fmt.Printf("API Response as struct %+v\n", responseObject)s
 
 }
 
