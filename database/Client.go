@@ -17,7 +17,7 @@ func Connect(connectionString string) {
 
 	if dbError != nil {
 		log.Fatal(dbError)
-		panic("Cannot connect to DB")
+		//panic ("failed to connect to database")
 	}
 	log.Println("Connected to Database!")
 }

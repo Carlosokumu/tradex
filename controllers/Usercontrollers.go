@@ -16,8 +16,10 @@ func RegisterUser(context *gin.Context) {
 	var user models.User
 	var password string
 
-	d := form.NewDecoder(context.Request.Body)
-	if err := d.Decode(&user); err != nil {
+	//d := form.NewDecoder(context.Request.Body)
+	context.BindJSON(&user)
+	//if err := d.Decode(&user); err != nil 
+	  if err:=context.BindJSON(&user);err!=nil{
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
 		log.Fatal(err)
 		context.Abort()
@@ -25,7 +27,7 @@ func RegisterUser(context *gin.Context) {
 	}
 	password = user.Password
 
-	if err := user.HashPassword(user.Password); err != nil {
+	if err := user.HashPassword(); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
 		context.Abort()
 		log.Fatal(err)
