@@ -41,7 +41,7 @@ func RegisterUser(context *gin.Context) {
 		fmt.Println("Creation Error")
 		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
 		context.Abort()
-		//log.Fatal(record.Error)
+		log.Fatal(record.Error)
 		return
 	}
 
