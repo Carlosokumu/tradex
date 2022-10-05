@@ -17,7 +17,8 @@ func main() {
 	
 	//path := "postgres://lmbdoeimaxunbj:5aaf1d7c9fec6e330ec64a15059c8b7f66db09c2711e87cc0d56a4cffec03b0d@ec2-44-206-11-200.compute-1.amazonaws.com:5432/d99joi1q9b5r3t"
 	//Connect to Postgres and migrate for the schemas
-	database.Connect("DATABASE_URL")
+	databaseUrl := os.Getenv("DATABASE_URL")
+	database.Connect(databaseUrl)
 	database.Migrate()
 
 	
