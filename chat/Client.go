@@ -95,10 +95,10 @@ func (c *Client) writePump() {
 				return
 			}
 			c.conn.WriteJSON(jsonData)
-			n := len(c.messages)
-			for i := 0; i < n; i++ {
-				c.conn.WriteJSON(jsonData)
-			}
+			// n := len(c.messages)
+			// for i := 0; i < n; i++ {
+			// 	c.conn.WriteJSON(jsonData)
+			// }
 
 		}
 	}
