@@ -95,6 +95,7 @@ func (c *Client) writePump() {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+
 			c.conn.WriteJSON(jsonData)
 			// n := len(c.messages)
 			// for i := 0; i < n; i++ {
