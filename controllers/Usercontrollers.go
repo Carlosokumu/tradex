@@ -50,6 +50,7 @@ func RegisterUser(context *gin.Context) {
 		LastName:               user.LastName,
 		Password:               password,
 		Balance:                user.Balance,
+		Username:               user.Username,
 		Email:                  user.Email,
 		FloatingProfit:         user.FloatingProfit,
 		PhoneNumber:            user.PhoneNumber,
