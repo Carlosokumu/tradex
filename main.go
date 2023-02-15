@@ -9,6 +9,7 @@ import (
 	"github.com/carlosokumu/dubbedapi/chat"
 	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/carlosokumu/dubbedapi/database"
+	"github.com/carlosokumu/dubbedapi/verification"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,7 +55,7 @@ func initRouter() *gin.Engine {
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
 		api.POST("/user/deposit", controllers.HandleDeposit)
 		api.GET("/user/userinfo", controllers.GetUserInfo)
-
+        api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
 	}
 	return router
 }

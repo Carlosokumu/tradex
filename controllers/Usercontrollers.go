@@ -8,16 +8,23 @@ import (
 	"github.com/ajg/form"
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
+	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
+//global variable
+var Trader models.User
+
 func RegisterUser(context *gin.Context) {
 	var user models.User
 	var password string
+	var Token    string
+	
 
 	d := form.NewDecoder(context.Request.Body)
-	if err := d.Decode(&user); err != nil {
+	
+	if err := d.Decode(&user); err != nil{
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
 		log.Fatal(err)
 		context.Abort()
@@ -25,7 +32,7 @@ func RegisterUser(context *gin.Context) {
 	}
 	password = user.Password
 
-	if err := user.HashPassword(user.Password); err != nil {
+	if err := user.HashPassword(); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
 		context.Abort()
 		log.Fatal(err)
@@ -42,6 +49,13 @@ func RegisterUser(context *gin.Context) {
 		//log.Fatal(record.Error)
 		return
 	}
+	
+    tokenString, errors:=token.GenerateJWT(user.Email,user.Username)
+	if errors!=nil{
+		fmt.Println("failed to generate token:",errors)
+		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
+		return
+	}
 
 	context.JSON(http.StatusCreated, gin.H{"user": models.User{
 		FirstName:              user.FirstName,
@@ -53,12 +67,14 @@ func RegisterUser(context *gin.Context) {
 		FloatingProfit:         user.FloatingProfit,
 		PhoneNumber:            user.PhoneNumber,
 		PercentageContribution: user.PercentageContribution,
-	}})
+	},
+     Token:                      tokenString,
+	})
 }
 
 func LoginUser(context *gin.Context) {
 	var credentials models.Credentials
-	var user models.User
+	var tokens token.Token
 
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&credentials); err != nil {
@@ -67,7 +83,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
+	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&Trader).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
@@ -77,7 +93,7 @@ func LoginUser(context *gin.Context) {
 
 	fmt.Println("rawpassword", credentials.Password)
 
-	result := CheckPasswordHash(credentials.Password, user.Password)
+	result := CheckPasswordHash(credentials.Password, Trader.Password)
 	fmt.Println("match", result)
 
 	if err != nil {
@@ -91,11 +107,21 @@ func LoginUser(context *gin.Context) {
 
 	fmt.Println(password)
 
-	if result {
-		context.JSON(http.StatusOK, gin.H{"user": user})
-	} else {
+	if !result {
 		context.JSON(http.StatusForbidden, gin.H{"response": "unmatch"})
+		return
+	} 
+	tokenstring, errors:=token.GenerateJWT(Trader.Email,Trader.Username)
+     
+	if errors!=nil{
+		fmt.Println("failed to generate token:",errors)
+		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
+		return
 	}
+	tokens.User=Trader
+	tokens.TokenString=tokenstring
+
+	context.JSON(http.StatusOK, gin.H{"user":tokens})
 
 }
 
