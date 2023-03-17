@@ -14,6 +14,8 @@ import (
 
 func InsertPositionData(context *gin.Context) {
 
+	fmt.Println("Request....")
+
 	bodyBytes, err := ioutil.ReadAll(context.Request.Body)
 
 	if err != nil {
