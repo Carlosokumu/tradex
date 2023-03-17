@@ -30,8 +30,8 @@ type User struct {
 	Equity                 *float64 `gorm:"default:0" form:"equity,omitempty"`
 }
 
-func (user *User) HashPassword(password string) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+func (user *User) HashPassword() error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
 		return err
 	}
