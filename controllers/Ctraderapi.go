@@ -36,15 +36,6 @@ func InsertPositionData(context *gin.Context) {
 		return
 	}
 
-	fmt.Println("Ctrader Sendind data:Entry Price ", responseObject.EntryPrice)
-	fmt.Println("Ctrader Sendind data:Position Id", responseObject.PositionId)
-	fmt.Println("Ctrader Sendind data:TradeType", responseObject.TradeType)
-	fmt.Println("Ctrader Sendind data:EntryTime", responseObject.EntryTime)
-	fmt.Println("Ctrader Sendind data:Quantity", responseObject.Quantity)
-	fmt.Println("Ctrader Sendind data:StopLoss", responseObject.StopLoss)
-	fmt.Println("Ctrader Sendind data:TakeProfit", responseObject.TakeProfit)
-
-	context.String(http.StatusOK, "Hellow")
 }
 
 func GetOpenPositions(context *gin.Context) {
