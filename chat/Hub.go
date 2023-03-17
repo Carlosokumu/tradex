@@ -34,7 +34,6 @@ func (h *Hub) Run() {
 				close(client.messages)
 			}
 		case jsonMessage := <-h.messenger:
-
 			for client := range h.clients {
 				select {
 				case client.messages <- jsonMessage:

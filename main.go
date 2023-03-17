@@ -36,10 +36,16 @@ func initRouter() *gin.Engine {
 		c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
 	})
 
-	//Websocket
+	//[Websocket] Endpoindts ------
 	router.GET("/ws", func(c *gin.Context) {
 		chat.ServeWs(hub, c.Writer, c.Request)
 	})
+
+	router.GET("/ws/bot", func(c *gin.Context) {
+		controllers.ReadBotEndpoint(c.Writer, c.Request)
+	})
+
+	//----------
 
 	api := router.Group("/tradex")
 	{
