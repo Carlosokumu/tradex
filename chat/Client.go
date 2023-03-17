@@ -39,7 +39,6 @@ type Client struct {
 }
 
 // readPump pumps messages from the websocket connection to the hub.
-//
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
@@ -54,16 +53,13 @@ func (c *Client) readPump() {
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		var msg ChatDetails
-
-		//_, message, err := c.conn.ReadMessage()
-		x := c.conn.ReadJSON(&msg)
-		if x != nil {
-			if websocket.IsUnexpectedCloseError(x, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", x)
+		err := c.conn.ReadJSON(&msg)
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("error: %v", err)
 			}
 			break
 		}
-		//client.RPush(ctx, "chats", msg, 0)
 		c.hub.messenger <- msg
 	}
 }
@@ -104,7 +100,6 @@ func (c *Client) writePump() {
 
 // serveWs handles websocket requests from the peer.
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	log.Println("Serving")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
