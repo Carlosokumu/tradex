@@ -13,18 +13,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-//global variable
+// global variable
 var Trader models.User
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
 	var password string
-	var Token    string
-	
+	var Token string
 
 	d := form.NewDecoder(context.Request.Body)
-	
-	if err := d.Decode(&user); err != nil{
+
+	if err := d.Decode(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
 		log.Fatal(err)
 		context.Abort()
@@ -49,10 +48,10 @@ func RegisterUser(context *gin.Context) {
 		//log.Fatal(record.Error)
 		return
 	}
-	
-    tokenString, errors:=token.GenerateJWT(user.Email,user.Username)
-	if errors!=nil{
-		fmt.Println("failed to generate token:",errors)
+
+	tokenString, errors := token.GenerateJWT(user.Email, user.Username)
+	if errors != nil {
+		fmt.Println("failed to generate token:", errors)
 		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
 		return
 	}
@@ -68,7 +67,7 @@ func RegisterUser(context *gin.Context) {
 		PhoneNumber:            user.PhoneNumber,
 		PercentageContribution: user.PercentageContribution,
 	},
-     Token:                      tokenString,
+		Token: tokenString,
 	})
 }
 
@@ -110,18 +109,18 @@ func LoginUser(context *gin.Context) {
 	if !result {
 		context.JSON(http.StatusForbidden, gin.H{"response": "unmatch"})
 		return
-	} 
-	tokenstring, errors:=token.GenerateJWT(Trader.Email,Trader.Username)
-     
-	if errors!=nil{
-		fmt.Println("failed to generate token:",errors)
+	}
+	tokenstring, errors := token.GenerateJWT(Trader.Email, Trader.Username)
+
+	if errors != nil {
+		fmt.Println("failed to generate token:", errors)
 		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
 		return
 	}
-	tokens.User=Trader
-	tokens.TokenString=tokenstring
+	tokens.User = Trader
+	tokens.TokenString = tokenstring
 
-	context.JSON(http.StatusOK, gin.H{"user":tokens})
+	context.JSON(http.StatusOK, gin.H{"user": Trader})
 
 }
 
