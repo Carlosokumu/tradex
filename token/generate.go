@@ -3,14 +3,15 @@ package token
 import (
 	"fmt"
 	"time"
+
 	"github.com/golang-jwt/jwt"
 )
 
-//global variable
-var Secretkey="Leonmjaluo"
+// global variable
+var Secretkey = "Swingwizards"
 
-//generate JWT token
-func GenerateJWT(email,username string) (string, error) {
+// generate JWT token
+func GenerateJWT(email, username string) (string, error) {
 	var mySigningKey = []byte(Secretkey)
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
@@ -21,7 +22,7 @@ func GenerateJWT(email,username string) (string, error) {
 
 	tokenString, err := token.SignedString(mySigningKey)
 	if err != nil {
-		fmt.Println("something went wrong",err)
+		fmt.Println("something went wrong", err)
 		return "", err
 	}
 
