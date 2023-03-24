@@ -19,7 +19,7 @@ var Trader models.User
 func RegisterUser(context *gin.Context) {
 	var user models.User
 	var password string
-	var Token string
+	//var Token string
 
 	d := form.NewDecoder(context.Request.Body)
 
@@ -49,7 +49,7 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-	tokenString, errors := token.GenerateJWT(user.Email, user.Username)
+	_, errors := token.GenerateJWT(user.Email, user.Username)
 	if errors != nil {
 		fmt.Println("failed to generate token:", errors)
 		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
@@ -66,9 +66,8 @@ func RegisterUser(context *gin.Context) {
 		FloatingProfit:         user.FloatingProfit,
 		PhoneNumber:            user.PhoneNumber,
 		PercentageContribution: user.PercentageContribution,
-	},
-		Token: tokenString,
-	})
+	}},
+	)
 }
 
 func LoginUser(context *gin.Context) {
