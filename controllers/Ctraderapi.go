@@ -13,9 +13,6 @@ import (
 )
 
 func InsertPositionData(context *gin.Context) {
-
-	fmt.Println("Request....")
-
 	bodyBytes, err := ioutil.ReadAll(context.Request.Body)
 
 	if err != nil {
@@ -45,10 +42,7 @@ func GetOpenPositions(context *gin.Context) {
 	var openposition []models.OpenPosition
 	var user models.User
 	result := database.Instance.Table("open_positions").Find(&openposition)
-	fmt.Println("Fetching data  from api")
 	user.GetMtAccountBalance()
-
-	fmt.Println(result.RowsAffected)
 
 	if result.Error != nil {
 		log.Fatal(result)
