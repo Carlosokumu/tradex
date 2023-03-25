@@ -116,15 +116,6 @@ func LoginUser(context *gin.Context) {
 
 }
 
-func UpdateUser(context *gin.Context) {
-
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", "webman").Update("username", "kalonje"); result.Error != nil {
-		log.Fatal(result.Error)
-		fmt.Println("Cannot find User")
-	}
-	context.JSON(http.StatusOK, "Done")
-}
-
 func UpdatePhoneNumber(context *gin.Context) {
 	var phoneinfo models.PhoneInfo
 
