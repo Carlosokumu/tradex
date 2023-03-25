@@ -42,16 +42,14 @@ func RegisterUser(context *gin.Context) {
 
 	record := database.Instance.Create(&user)
 	if record.Error != nil {
-		fmt.Println("Creation Error")
 		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
 		context.Abort()
-		//log.Fatal(record.Error)
 		return
 	}
 
-	_, errors := token.GenerateJWT(user.Email, user.Username)
-	if errors != nil {
-		fmt.Println("failed to generate token:", errors)
+	_, tokenError := token.GenerateJWT(user.Email, user.Username)
+	if tokenError != nil {
+		fmt.Println("failed to generate token:", tokenError)
 		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
 		return
 	}
@@ -88,12 +86,7 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
-
-	fmt.Println("rawpassword", credentials.Password)
-
 	result := CheckPasswordHash(credentials.Password, Trader.Password)
-	fmt.Println("match", result)
-
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": "something went wrong"})
 		fmt.Println(err)
