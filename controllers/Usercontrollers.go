@@ -98,7 +98,7 @@ func LoginUser(context *gin.Context) {
 	if result {
 		context.JSON(http.StatusOK, gin.H{"user": user})
 	} else {
-		context.JSON(http.StatusUnauthorized, gin.H{"response": "unmatch"})
+		context.JSON(http.StatusUnauthorized, gin.H{"response": "password does not match username"})
 	}
 
 }
