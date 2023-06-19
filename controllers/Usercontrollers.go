@@ -86,23 +86,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	bytes, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
-	result := CheckPasswordHash(credentials.Password, Trader.Password)
-	if err != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": "something went wrong"})
-		fmt.Println(err)
-		context.Abort()
-		return
-	}
 
-	password := string(bytes)
-
-	fmt.Println(password)
-
-	if !result {
-		context.JSON(http.StatusForbidden, gin.H{"response": "unmatch"})
-		return
-	}
 	tokenstring, errors := token.GenerateJWT(Trader.Email, Trader.Username)
 
 	if errors != nil {
