@@ -93,7 +93,6 @@ func LoginUser(context *gin.Context) {
 		return
 	}
 	result := CheckPasswordHash(credentials.Password, user.Password)
-	fmt.Println("match", result)
 
 	if result {
 		context.JSON(http.StatusOK, gin.H{"user": user})
