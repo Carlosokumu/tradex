@@ -71,6 +71,7 @@ func RegisterUser(context *gin.Context) {
 func LoginUser(context *gin.Context) {
 	var credentials models.Credentials
 	var tokens token.Token
+	var user models.User
 
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&credentials); err != nil {
@@ -79,7 +80,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Where("username = ?", credentials.UserName).First(&Trader).Error; result != nil {
+	if result := database.Instance.Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
