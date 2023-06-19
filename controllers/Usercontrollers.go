@@ -70,7 +70,6 @@ func RegisterUser(context *gin.Context) {
 
 func LoginUser(context *gin.Context) {
 	var credentials models.Credentials
-	var tokens token.Token
 	var user models.User
 
 	d := form.NewDecoder(context.Request.Body)
@@ -86,18 +85,21 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
+	_, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
 
-	tokenstring, errors := token.GenerateJWT(Trader.Email, Trader.Username)
-
-	if errors != nil {
-		fmt.Println("failed to generate token:", errors)
-		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"response": err})
+		context.Abort()
 		return
 	}
-	tokens.User = Trader
-	tokens.TokenString = tokenstring
+	result := CheckPasswordHash(credentials.Password, user.Password)
+	fmt.Println("match", result)
 
-	context.JSON(http.StatusOK, gin.H{"user": Trader})
+	if result {
+		context.JSON(http.StatusOK, gin.H{"user": user})
+	} else {
+		context.JSON(http.StatusUnauthorized, gin.H{"response": "unmatch"})
+	}
 
 }
 
