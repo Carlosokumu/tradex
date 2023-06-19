@@ -43,7 +43,7 @@ type Client struct {
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
 func (c *Client) readPump() {
-	fmt.Println("Reading from webscoket to hub")
+	fmt.Println("Reading from websocket to hub")
 	defer func() {
 		c.hub.unregister <- c
 		c.conn.Close()

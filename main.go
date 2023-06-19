@@ -53,7 +53,6 @@ func initRouter() *gin.Engine {
 
 		api.POST("/user/register", controllers.RegisterUser)
 		api.POST("/positiondata/add", controllers.InsertPositionData)
-		api.PATCH("/user", controllers.UpdateUser)
 		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 		api.GET("/positions/all", controllers.GetOpenPositions)
 		api.POST("/user/login", controllers.LoginUser)
@@ -61,7 +60,7 @@ func initRouter() *gin.Engine {
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
 		api.POST("/user/deposit", controllers.HandleDeposit)
 		api.GET("/user/userinfo", controllers.GetUserInfo)
-        api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
+		api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
 	}
 	return router
 }
