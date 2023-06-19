@@ -80,7 +80,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
+	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
