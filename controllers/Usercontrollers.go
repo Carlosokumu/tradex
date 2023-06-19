@@ -50,7 +50,7 @@ func RegisterUser(context *gin.Context) {
 	_, tokenError := token.GenerateJWT(user.Email, user.Username)
 	if tokenError != nil {
 		fmt.Println("failed to generate token:", tokenError)
-		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": errors})
+		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": tokenError})
 		return
 	}
 
