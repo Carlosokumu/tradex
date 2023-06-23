@@ -38,7 +38,7 @@ func initRouter() *gin.Engine {
 	go hub.Run()
 	router := gin.Default()
 
-	router.Use(IPWhiteList(whitelist))
+	router.Use(allowAllDomains())
 	router.LoadHTMLGlob("html/*")
 
 	router.GET("/rascamps", func(c *gin.Context) {
@@ -82,5 +82,17 @@ func IPWhiteList(whitelist map[string]bool) gin.HandlerFunc {
 			})
 			return
 		}
+	}
+}
+
+func allowAllDomains() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Set the appropriate CORS headers to allow access from any domain
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		// Handle the request
+		c.Next()
 	}
 }
