@@ -21,6 +21,8 @@ func RegisterUser(context *gin.Context) {
 	var password string
 	//var Token string
 
+	fmt.Println("REQUESTURL:", context.Request.URL)
+
 	d := form.NewDecoder(context.Request.Body)
 
 	if err := d.Decode(&user); err != nil {
