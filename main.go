@@ -29,10 +29,16 @@ func main() {
 }
 
 func initRouter() *gin.Engine {
+
+	whitelist := make(map[string]bool)
+	whitelist["https://swingwizards.vercel.ap"] = true
 	hub := chat.NewHub()
 	go hub.Run()
 	router := gin.Default()
+
+	router.Use(IPWhiteList(whitelist))
 	router.LoadHTMLGlob("html/*")
+
 	router.GET("/rascamps", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
 	})
@@ -63,4 +69,16 @@ func initRouter() *gin.Engine {
 		api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
 	}
 	return router
+}
+
+func IPWhiteList(whitelist map[string]bool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !whitelist[c.ClientIP()] {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"status":  http.StatusForbidden,
+				"message": "Permission denied",
+			})
+			return
+		}
+	}
 }
