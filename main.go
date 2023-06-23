@@ -31,7 +31,7 @@ func main() {
 func initRouter() *gin.Engine {
 
 	whitelist := make(map[string]bool)
-	whitelist["https://swingwizards.vercel.ap"] = true
+	whitelist["https://swingwizards.vercel.app"] = true
 	hub := chat.NewHub()
 	go hub.Run()
 	router := gin.Default()
