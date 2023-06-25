@@ -30,7 +30,7 @@ func Migrate() {
 	)
 
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	log.Println("Database Migration Completed!")
 }

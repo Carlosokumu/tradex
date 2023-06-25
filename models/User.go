@@ -32,6 +32,7 @@ type User struct {
 }
 
 type Position struct {
+	gorm.Model
 	PositionId string
 }
 
