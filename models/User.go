@@ -28,7 +28,7 @@ type User struct {
 	PercentageContribution *float64   `gorm:"default:0" form:"contribution,omitempty"`
 	FloatingProfit         *float64   `gorm:"default:0" form:"floatingprofit,omitempty"`
 	Equity                 *float64   `gorm:"default:0" form:"equity,omitempty"`
-	Positions              []Position `gorm:"foreignkey:ParentID" form:"positions,omitempty"`
+	Positions              []Position `gorm:"foreignkey:Username" form:"positions,omitempty"`
 }
 
 type Position struct {
