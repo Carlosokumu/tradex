@@ -33,7 +33,7 @@ type User struct {
 
 type RunningPosition struct {
 	gorm.Model
-	UserID string `gorm:"size:50;default:null;unique" form:"userid,omitempty"`
+	UserID uint `gorm:"size:50;default:null;unique" form:"userid,omitempty"`
 }
 
 func (user *User) HashPassword() error {
