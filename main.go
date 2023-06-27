@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"net/http"
 
@@ -18,12 +17,14 @@ func main() {
 	fmt.Println("Fetching data  from api")
 
 	//Connect to Postgres and migrate for the schemas
-	databaseUrl := os.Getenv("DATABASE_URL")
+	//databaseUrl := os.Getenv("DATABASE_URL")
+	databaseUrl := "postgres://swinngdata_user:4nZcOypBKc8E6RU96BftsnBMgClMGxqn@dpg-ci805l98g3n3vm2k9ifg-a.oregon-postgres.render.com/swinngdata"
 	database.Connect(databaseUrl)
 	database.Migrate()
 
 	router := initRouter()
-	port := os.Getenv("PORT")
+	//port := os.Getenv("PORT")
+	port := "8080"
 	router.Run(":" + port)
 
 }

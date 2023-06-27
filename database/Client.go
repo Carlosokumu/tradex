@@ -27,6 +27,7 @@ func Migrate() {
 		&models.User{},
 		&models.OpenPosition{},
 		&models.Transactions{},
+		&models.RunningPosition{},
 	)
 
 	if err != nil {

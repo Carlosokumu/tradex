@@ -33,7 +33,17 @@ type User struct {
 
 type RunningPosition struct {
 	gorm.Model
-	UserID uint `gorm:"size:50;default:null;unique" form:"userid,omitempty"`
+	UserID          uint
+	Volume          *int64
+	Price           *float64
+	TradeSide       *int32
+	SymbolId        *int64
+	OpenTime        *int64
+	Commission      *int64
+	Swap            *int64
+	MoneyDigits     *uint32
+	PositionRisk    *float32
+	PositionsReward *float32
 }
 
 func (user *User) HashPassword() error {
