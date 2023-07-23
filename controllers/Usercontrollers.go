@@ -164,7 +164,7 @@ func HandleDeposit(context *gin.Context) {
 	var user models.User
 	var transactions models.Transactions
 	var updatedUser models.User
-	currentMarketPrice := 119.99
+	//currentMarketPrice := 119.99
 
 	//Handle decode for the user trying to deposit
 	d := form.NewDecoder(context.Request.Body)
@@ -209,29 +209,29 @@ func HandleDeposit(context *gin.Context) {
 		return
 	}
 	//Create a percentage contribution to the currently available balance from mt4 balance
-	mt4Balance, err := user.GetMtAccountBalance()
+	//mt4Balance := 200.
 
-	if err != nil {
-		context.JSON(http.StatusLocked, gin.H{"Error": "Mt4 Paused"})
-		//log.Fatal("BALANCERRROR", err)
-		context.Abort()
-	}
-	accountBalance := *&mt4Balance.Balance
-	contributionUsd := *updatedUser.Balance / currentMarketPrice
-	contribution := (contributionUsd / accountBalance) * 100
+	// if err != nil {
+	// 	context.JSON(http.StatusLocked, gin.H{"Error": "Mt4 Paused"})
+	// 	//log.Fatal("BALANCERRROR", err)
+	// 	context.Abort()
+	// }
+	// accountBalance := 200
+	// contributionUsd := *updatedUser.Balance / currentMarketPrice
+	// contribution := (contributionUsd / accountBalance) * 100
 
 	//Update the user's contribution  after a sucessfull deposit.
-	fmt.Println("%CONTR", contribution)
+	//fmt.Println("%CONTR", contribution)
 
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("percentage_contribution", contribution); result.Error != nil {
-		log.Fatal(result.Error)
-		context.JSON(http.StatusNotFound, gin.H{"Error": result.Error})
-		context.Abort()
-		fmt.Println("Cannot find User")
-	}
+	// if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("percentage_contribution", contribution); result.Error != nil {
+	// 	log.Fatal(result.Error)
+	// 	context.JSON(http.StatusNotFound, gin.H{"Error": result.Error})
+	// 	context.Abort()
+	// 	fmt.Println("Cannot find User")
+	// }
 
-	fmt.Println("USDVALUE:", contributionUsd)
-	context.JSON(http.StatusCreated, gin.H{"response": contribution})
+	//fmt.Println("USDVALUE:", contributionUsd)
+	context.JSON(http.StatusCreated, gin.H{"response": 0.0})
 }
 
 func GetUserInfo(context *gin.Context) {
