@@ -160,10 +160,17 @@ func SendOtp(context *gin.Context) {
 
 func HandleDeposit(context *gin.Context) {
 
-	var depositDetails models.DepositDetails
-	var user models.User
-	var transactions models.Transactions
-	var updatedUser models.User
+	//var depositDetails models.DepositDetails
+	//var user models.User
+	//var transactions models.Transactions
+	//var updatedUser models.User
+	var (
+		depositDetails models.DepositDetails
+		user           models.User
+		transactions   models.Transactions
+		updatedUser    models.User
+		master         models.MasterAccount
+	)
 	//currentMarketPrice := 119.99
 
 	//Handle decode for the user trying to deposit
@@ -181,6 +188,13 @@ func HandleDeposit(context *gin.Context) {
 		Amount:      depositDetails.Amount,
 	}
 
+	if result := database.Instance.Table("master_accounts").Where("account_login = ?", "3778357").First(&master).Error; result != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
+		fmt.Println(result)
+		context.Abort()
+		return
+	}
+
 	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&user).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
@@ -195,6 +209,9 @@ func HandleDeposit(context *gin.Context) {
 		log.Fatal(record.Error)
 		return
 	}
+	userAccountReading := *user.Balance + depositDetails.Amount
+	userContribution := userAccountReading / float64(*master.Balance)
+	fmt.Println("UserContribution:", userContribution)
 
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", *user.Balance+depositDetails.Amount); result.Error != nil {
 		log.Fatal(result.Error)
