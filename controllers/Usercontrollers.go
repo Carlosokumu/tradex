@@ -210,15 +210,22 @@ func HandleDeposit(context *gin.Context) {
 		return
 	}
 	userAccountReading := *user.Balance + depositDetails.Amount
-	userContribution := userAccountReading / float64(*master.Balance)
+	userContribution := userAccountReading / float64(*master.Balance/100.0)
 	fmt.Println("UserContribution:", userContribution)
 
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", *user.Balance+depositDetails.Amount); result.Error != nil {
+	// if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", userAccountReading); result.Error != nil {
+	// 	log.Fatal(result.Error)
+	// 	context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
+	// 	context.Abort()
+	// 	fmt.Println("Cannot find User")
+	// }
+	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Updates(map[string]interface{}{"balance": userAccountReading, "percentage_contribution": userContribution}); result.Error != nil {
 		log.Fatal(result.Error)
 		context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
 		context.Abort()
 		fmt.Println("Cannot find User")
 	}
+
 	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&updatedUser).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
