@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
-	"os"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -66,15 +65,15 @@ func (user *User) CheckPassword(providedPassword string) error {
 func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 
 	//password := "hulisbfeulyecjpc"
-	smarttader := "gntgkspsfqmkwech"
+	smarttader := "qzpbyilzejvnabsr"
 
 	host := "smtp.gmail.com"
 
-	gmailAuth := smtp.PlainAuth("", "smarttraderkenya", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles("html/registration.html")
-	address := host + ":" + os.Getenv("MAILPORT")
-
+	//address := host + ":" + os.Getenv("MAILPORT")
+	address := host + ":" + "587"
 	if err != nil {
 		panic(err)
 	}
@@ -90,7 +89,7 @@ func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 		Name: confirmationdata.UserName,
 	})
 
-	senderr := smtp.SendMail(address, gmailAuth, "smarttraderkenya@gmail.com", []string{confirmationdata.Email}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{confirmationdata.Email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
@@ -110,16 +109,17 @@ func (user *User) SendOtpCode(email string) string {
 
 func getGmailAuth(email, filename string, emailBody interface{}) {
 	//password := "hulisbfeulyecjpc"
-	smarttader := "jxkpndrkvjbceokd"
+	smarttader := "qzpbyilzejvnabsr"
 
 	host := "smtp.gmail.com"
 
 	// Configure hermes by setting a theme and your product info
 
-	gmailAuth := smtp.PlainAuth("", "smarttraderkenya@gmail.com", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "carlosokumu@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles(filename)
-	address := host + ":" + os.Getenv("MAILPORT")
+	//address := host + ":" + os.Getenv("MAILPORT")
+	address := host + ":" + "587"
 
 	if err != nil {
 		panic(err)
