@@ -65,11 +65,11 @@ func (user *User) CheckPassword(providedPassword string) error {
 func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 
 	//password := "hulisbfeulyecjpc"
-	smarttader := "qzpbyilzejvnabsr"
+	smarttader := "ubwmvktbfovpzonk"
 
 	host := "smtp.gmail.com"
 
-	gmailAuth := smtp.PlainAuth("", "carlosokumu254@gmail.com", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "swingwizardsinfo@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles("html/registration.html")
 	//address := host + ":" + os.Getenv("MAILPORT")
@@ -89,7 +89,7 @@ func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 		Name: confirmationdata.UserName,
 	})
 
-	senderr := smtp.SendMail(address, gmailAuth, "carlosokumu254@gmail.com", []string{confirmationdata.Email}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "swingwizardsinfo@gmail.com", []string{confirmationdata.Email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
@@ -109,13 +109,13 @@ func (user *User) SendOtpCode(email string) string {
 
 func getGmailAuth(email, filename string, emailBody interface{}) {
 	//password := "hulisbfeulyecjpc"
-	smarttader := "qzpbyilzejvnabsr"
+	smarttader := "ubwmvktbfovpzonk"
 
 	host := "smtp.gmail.com"
 
 	// Configure hermes by setting a theme and your product info
 
-	gmailAuth := smtp.PlainAuth("", "carlosokumu@gmail.com", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "swingwizardsinfo@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles(filename)
 	//address := host + ":" + os.Getenv("MAILPORT")
@@ -136,7 +136,7 @@ func getGmailAuth(email, filename string, emailBody interface{}) {
 		log.Fatal(terr)
 	}
 
-	senderr := smtp.SendMail(address, gmailAuth, "smarttraderkenya@gmail.com", []string{email}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "swingwizardsinfo@gmail.com", []string{email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
