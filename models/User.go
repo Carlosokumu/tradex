@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
-	"os"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -18,16 +17,32 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName              string   `gorm:"size:255;not null" form:"firstname"`
-	LastName               string   `gorm:"size:255;not null" form:"lastname"`
-	Username               string   `gorm:"size:150;not null;unique" form:"username"`
-	Email                  string   `gorm:"size:100;not null;unique" form:"email"`
-	Password               string   `gorm:"size:100;not null" form:"password"`
-	PhoneNumber            string   `gorm:"size:50;not null;unique" form:"phonenumber,omitempty"`
-	Balance                *float64 `gorm:"default:0" form:"balance"`
-	PercentageContribution *float64 `gorm:"default:0" form:"contribution,omitempty"`
-	FloatingProfit         *float64 `gorm:"default:0" form:"floatingprofit,omitempty"`
-	Equity                 *float64 `gorm:"default:0" form:"equity,omitempty"`
+	FirstName              string            `gorm:"size:255;not null" form:"firstname"`
+	LastName               string            `gorm:"size:255;not null" form:"lastname"`
+	Username               string            `gorm:"size:150;not null;unique" form:"username"`
+	Email                  string            `gorm:"size:100;not null;unique" form:"email"`
+	Password               string            `gorm:"size:100;not null" form:"password"`
+	PhoneNumber            string            `gorm:"size:50;unique_index:idx_phone_number_null" form:"phonenumber,omitempty"`
+	Balance                *float64          `gorm:"default:0" form:"balance"`
+	PercentageContribution *float64          `gorm:"default:0" form:"contribution,omitempty"`
+	FloatingProfit         *float64          `gorm:"default:0" form:"floatingprofit,omitempty"`
+	Equity                 *float64          `gorm:"default:0" form:"equity,omitempty"`
+	Positions              []RunningPosition `gorm:"foreignkey:UserID" form:"positions,omitempty"`
+}
+
+type RunningPosition struct {
+	gorm.Model
+	UserID          uint
+	Volume          *int64
+	Price           *float64
+	TradeSide       *int32
+	SymbolId        *int64
+	OpenTime        *int64
+	Commission      *int64
+	Swap            *int64
+	MoneyDigits     *uint32
+	PositionRisk    *float32
+	PositionsReward *float32
 }
 
 func (user *User) HashPassword() error {
@@ -50,15 +65,15 @@ func (user *User) CheckPassword(providedPassword string) error {
 func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 
 	//password := "hulisbfeulyecjpc"
-	smarttader := "gntgkspsfqmkwech"
+	smarttader := "ubwmvktbfovpzonk"
 
 	host := "smtp.gmail.com"
 
-	gmailAuth := smtp.PlainAuth("", "smarttraderkenya", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "swingwizardsinfo@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles("html/registration.html")
-	address := host + ":" + os.Getenv("MAILPORT")
-
+	//address := host + ":" + os.Getenv("MAILPORT")
+	address := host + ":" + "587"
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +89,7 @@ func (user *User) SendMailConfirmation(confirmationdata *ConfirmationData) {
 		Name: confirmationdata.UserName,
 	})
 
-	senderr := smtp.SendMail(address, gmailAuth, "smarttraderkenya@gmail.com", []string{confirmationdata.Email}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "swingwizardsinfo@gmail.com", []string{confirmationdata.Email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)
@@ -94,16 +109,17 @@ func (user *User) SendOtpCode(email string) string {
 
 func getGmailAuth(email, filename string, emailBody interface{}) {
 	//password := "hulisbfeulyecjpc"
-	smarttader := "jxkpndrkvjbceokd"
+	smarttader := "ubwmvktbfovpzonk"
 
 	host := "smtp.gmail.com"
 
 	// Configure hermes by setting a theme and your product info
 
-	gmailAuth := smtp.PlainAuth("", "smarttraderkenya@gmail.com", smarttader, host)
+	gmailAuth := smtp.PlainAuth("", "swingwizardsinfo@gmail.com", smarttader, host)
 
 	t, err := template.ParseFiles(filename)
-	address := host + ":" + os.Getenv("MAILPORT")
+	//address := host + ":" + os.Getenv("MAILPORT")
+	address := host + ":" + "587"
 
 	if err != nil {
 		panic(err)
@@ -120,7 +136,7 @@ func getGmailAuth(email, filename string, emailBody interface{}) {
 		log.Fatal(terr)
 	}
 
-	senderr := smtp.SendMail(address, gmailAuth, "smarttraderkenya@gmail.com", []string{email}, body.Bytes())
+	senderr := smtp.SendMail(address, gmailAuth, "swingwizardsinfo@gmail.com", []string{email}, body.Bytes())
 
 	if senderr != nil {
 		log.Fatal(senderr)

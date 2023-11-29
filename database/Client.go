@@ -17,7 +17,6 @@ func Connect(connectionString string) {
 
 	if dbError != nil {
 		log.Fatal(dbError)
-		//panic ("failed to connect to database")
 	}
 	log.Println("Connected to Database!")
 }
@@ -28,10 +27,11 @@ func Migrate() {
 		&models.User{},
 		&models.OpenPosition{},
 		&models.Transactions{},
+		&models.RunningPosition{},
 	)
 
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	log.Println("Database Migration Completed!")
 }
