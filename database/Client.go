@@ -24,10 +24,12 @@ func Connect(connectionString string) {
 func Migrate() {
 
 	err := Instance.AutoMigrate(
-		&models.User{},
-		&models.OpenPosition{},
-		&models.Transactions{},
-		&models.RunningPosition{},
+		//&models.User{},
+		//&models.OpenPosition{},
+		//&models.Transactions{},
+		//&models.RunningPosition{},
+		&models.UserModel{},
+		&models.TradingAccount{},
 	)
 
 	if err != nil {
