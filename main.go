@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+//	"os"
 
 	"net/http"
 
@@ -15,13 +15,15 @@ import (
 func main() {
 
 	//Connect to Postgres and migrate for the schemas
-	databaseUrl := os.Getenv("DATABASE_URL")
+	//databaseUrl := os.Getenv("DATABASE_URL")
+	databaseUrl:= "postgres://swingwizards_users_user:U84u2BM2lRGFIoCArcrIxtYaLQ3fhBmd@dpg-clk1dveg1b2c739f9rqg-a.oregon-postgres.render.com/swingwizards_users"
 	database.Connect(databaseUrl)
 	database.Migrate()
 
 	router := initRouter()
-	port := os.Getenv("PORT")
-	router.Run(":" + port)
+	//port := os.Getenv("PORT")
+	port:=":4000"
+	router.Run(port)
 
 }
 
@@ -63,9 +65,10 @@ func initRouter() *gin.Engine {
 		api.POST("/user/login", controllers.LoginUser)
 		api.POST("/user/email", controllers.SendOtp)
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
-		api.POST("/user/deposit", controllers.HandleDeposit)
 		api.GET("/user/userinfo", controllers.GetUserInfo)
 		api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
+		api.POST("/user/emailpassword", controllers.EmailPassword)
+		api.POST("/user/accessrefreshaccoutsecret", controllers.Access_refresh_token_accout_id_secret)
 	}
 	return router
 }
