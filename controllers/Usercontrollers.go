@@ -9,16 +9,22 @@ import (
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/carlosokumu/dubbedapi/token"
+	"github.com/carlosokumu/dubbedapi/emailmethods"
+	"github.com/carlosokumu/dubbedapi/stringmethods"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+
 )
 
 // global variable
-var Trader models.User
+var (
+Trader models.User
+)
+
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
-	var password string
+	var userModel models.UserModel
 	//var Token string
 
 	fmt.Println("REQUESTURL:", context.Request.URL)
@@ -31,8 +37,26 @@ func RegisterUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	password = user.Password
+	username:= user.Username
+	email:= user.Email
+	password:= user.Password
 
+	_ = database.Instance.Table("user_models").Where("username",username).First(&userModel)
+
+	if(userModel.UserName != ""){
+	   context.JSON(http.StatusNotAcceptable, gin.H{"username error":"provided username already exists"})
+	}
+
+	
+	
+	if usernamelength:=stringmethods.Charactercount(username); usernamelength < 4 {
+		context.JSON(http.StatusBadRequest, gin.H{"username error":"username should be more of 4 or more characters"})
+	} else if emailformatcredibility, _:= emailmethods.Emailformatverifier(email); !emailformatcredibility{
+		context.JSON(http.StatusBadRequest, gin.H{"email error":"email address is invalid"})
+	} else if passwordlength:=stringmethods.Charactercount(password); passwordlength < 8 {
+		context.JSON(http.StatusBadRequest, gin.H{"password error":"password is weak or invalid"})
+	} else {
+	
 	if err := user.HashPassword(); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
 		context.Abort()
@@ -40,9 +64,15 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-	//Create a new user record into the database
+	
+	//Create a new userModel entity
+	userModel = models.UserModel {
+		UserName: user.Username,
+		Email: user.Email,
+		Password: user.Password,
+	}
 
-	record := database.Instance.Create(&user)
+	record := database.Instance.Create(&userModel)
 	if record.Error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
 		context.Abort()
@@ -57,17 +87,12 @@ func RegisterUser(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"user": models.User{
-		FirstName:              user.FirstName,
-		LastName:               user.LastName,
-		Password:               password,
-		Balance:                user.Balance,
 		Username:               user.Username,
 		Email:                  user.Email,
-		FloatingProfit:         user.FloatingProfit,
-		PhoneNumber:            user.PhoneNumber,
-		PercentageContribution: user.PercentageContribution,
+		Password:               user.Password,
 	}},
 	)
+}
 }
 
 func LoginUser(context *gin.Context) {
@@ -158,106 +183,6 @@ func SendOtp(context *gin.Context) {
 
 }
 
-func HandleDeposit(context *gin.Context) {
-
-	//var depositDetails models.DepositDetails
-	//var user models.User
-	//var transactions models.Transactions
-	//var updatedUser models.User
-	var (
-		depositDetails models.DepositDetails
-		user           models.User
-		transactions   models.Transactions
-		updatedUser    models.User
-		master         models.MasterAccount
-	)
-	//currentMarketPrice := 119.99
-
-	//Handle decode for the user trying to deposit
-	d := form.NewDecoder(context.Request.Body)
-
-	if err := d.Decode(&depositDetails); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-		log.Fatal(err)
-		context.Abort()
-		return
-	}
-	transactions = models.Transactions{
-		DepositedBy: depositDetails.UserName,
-		PhoneNumber: depositDetails.PhoneNumber,
-		Amount:      depositDetails.Amount,
-	}
-
-	if result := database.Instance.Table("master_accounts").Where("account_login = ?", "3778357").First(&master).Error; result != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
-		context.Abort()
-		return
-	}
-
-	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&user).Error; result != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
-		context.Abort()
-		return
-	}
-	//Create a new record for each deposit done by the user to the transactions table
-	record := database.Instance.Create(&transactions)
-	if record.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
-		context.Abort()
-		log.Fatal(record.Error)
-		return
-	}
-	userAccountReading := *user.Balance + depositDetails.Amount
-	userContribution := userAccountReading / float64(*master.Balance/100.0)
-	fmt.Println("UserContribution:", userContribution)
-
-	// if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("balance", userAccountReading); result.Error != nil {
-	// 	log.Fatal(result.Error)
-	// 	context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
-	// 	context.Abort()
-	// 	fmt.Println("Cannot find User")
-	// }
-	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Updates(map[string]interface{}{"balance": userAccountReading, "percentage_contribution": userContribution}); result.Error != nil {
-		log.Fatal(result.Error)
-		context.JSON(http.StatusNotAcceptable, gin.H{"Error": result.Error})
-		context.Abort()
-		fmt.Println("Cannot find User")
-	}
-
-	if result := database.Instance.Table("users").Where("username = ?", depositDetails.UserName).First(&updatedUser).Error; result != nil {
-		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
-		context.Abort()
-		return
-	}
-	//Create a percentage contribution to the currently available balance from mt4 balance
-	//mt4Balance := 200.
-
-	// if err != nil {
-	// 	context.JSON(http.StatusLocked, gin.H{"Error": "Mt4 Paused"})
-	// 	//log.Fatal("BALANCERRROR", err)
-	// 	context.Abort()
-	// }
-	// accountBalance := 200
-	// contributionUsd := *updatedUser.Balance / currentMarketPrice
-	// contribution := (contributionUsd / accountBalance) * 100
-
-	//Update the user's contribution  after a sucessfull deposit.
-	//fmt.Println("%CONTR", contribution)
-
-	// if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", depositDetails.UserName).Update("percentage_contribution", contribution); result.Error != nil {
-	// 	log.Fatal(result.Error)
-	// 	context.JSON(http.StatusNotFound, gin.H{"Error": result.Error})
-	// 	context.Abort()
-	// 	fmt.Println("Cannot find User")
-	// }
-
-	//fmt.Println("USDVALUE:", contributionUsd)
-	context.JSON(http.StatusCreated, gin.H{"response": 0.0})
-}
-
 func GetUserInfo(context *gin.Context) {
 	//var user models.User
 	var stagedUser models.User
@@ -299,4 +224,67 @@ func GetUserInfo(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"user": stagedUser})
+}
+
+func EmailPassword(context *gin.Context) {
+     var user models.EmailPassword
+	 fmt.Println("REQUESTURL:", context.Request.URL)
+
+	d := form.NewDecoder(context.Request.Body)
+
+	if err := d.Decode(&user); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	email:=user.Email
+	password:=user.Password
+	
+	if emailformatcredibility, _:= emailmethods.Emailformatverifier(email); !emailformatcredibility{
+		context.JSON(http.StatusBadRequest, gin.H{"email error":"email address is invalid"})
+	} else if passwordlength:=stringmethods.Charactercount(password); passwordlength < 8 {
+		context.JSON(http.StatusBadRequest, gin.H{"password error":"password is weak or invalid"})
+	} else {
+	context.JSON(http.StatusCreated, gin.H{"user": models.EmailPassword{
+		Email:                  user.Email,
+		Password:               user.Password,
+	}},
+	)
+}
+}
+func Access_refresh_token_accout_id_secret(context *gin.Context) {
+	var user models.AccessRefreshaccountsecret
+	fmt.Println("REQUESTURL:", context.Request.URL)
+
+   d := form.NewDecoder(context.Request.Body)
+
+   if err := d.Decode(&user); err != nil {
+	   context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+	   log.Fatal(err)
+	   context.Abort()
+	   return
+   }
+   access:=user.AccessToken
+   refresh:=user.RefreshToken
+   client_id:= user.Client_id
+   secret:=user.Secret
+   
+   if length:=stringmethods.Charactercount(access); length < 10 {
+	   context.JSON(http.StatusBadRequest, gin.H{"error":"empty access token"})
+   } else if length:=stringmethods.Charactercount(refresh); length < 10 {
+	context.JSON(http.StatusBadRequest, gin.H{"error":"empty refresh token"})
+   } else if length:=stringmethods.Charactercount(client_id); length < 1 {
+	context.JSON(http.StatusBadRequest, gin.H{"error":"empty account_id"})
+   }else if length:=stringmethods.Charactercount(secret); length < 10 {
+	context.JSON(http.StatusBadRequest, gin.H{"error":"empty secret"})
+   } else {
+   context.JSON(http.StatusCreated, gin.H{"user": models.AccessRefreshaccountsecret{
+	   AccessToken:                 user.AccessToken,
+	   RefreshToken:                user.RefreshToken,
+	   Client_id:             user.Client_id,
+	   Secret:                 user.Secret,
+   }},
+   )
+}
 }
