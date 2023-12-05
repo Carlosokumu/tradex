@@ -70,6 +70,7 @@ func initRouter() *gin.Engine {
 		api.POST("/user/emailpassword", controllers.EmailPassword)
 		api.POST("/user/accessrefreshaccoutsecret", controllers.Access_refresh_token_accout_id_secret)
 		api.GET("/user/getspecificuser", controllers.GetSpecificUser)
+		api.DELETE("/user/deletespecificuser", controllers.DeleteSpecificUser)
 	}
 	return router
 }
