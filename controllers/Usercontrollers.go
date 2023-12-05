@@ -306,3 +306,26 @@ func GetSpecificUser(context *gin.Context) {
 	}
 
 }
+
+func DeleteSpecificUser(context *gin.Context) {
+
+	var username models.Userdetailsaccessor
+	var userModel models.UserModel
+
+	d := form.NewDecoder(context.Request.Body)
+	if err := d.Decode(&username); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	if result := database.Instance.Table("user_models").Where("user_name = ?", username.Username).Delete(&userModel).Error; result != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
+		fmt.Println(result)
+		context.Abort()
+		return
+	}else{
+		context.JSON(http.StatusOK, gin.H{"user": userModel})
+	}
+
+}
