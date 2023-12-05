@@ -94,7 +94,7 @@ func RegisterUser(context *gin.Context) {
 
 func LoginUser(context *gin.Context) {
 	var credentials models.Credentials
-	var user models.User
+	var userModel models.UserModel
 
 	d := form.NewDecoder(context.Request.Body)
 	if err := d.Decode(&credentials); err != nil {
@@ -103,7 +103,7 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	if result := database.Instance.Table("users").Where("username = ?", credentials.UserName).First(&user).Error; result != nil {
+	if result := database.Instance.Table("user_models").Where("user_name = ?", credentials.UserName).First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
@@ -116,14 +116,13 @@ func LoginUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	result := CheckPasswordHash(credentials.Password, user.Password)
+	result := CheckPasswordHash(credentials.Password, userModel.Password)
 
 	if result {
-		context.JSON(http.StatusOK, gin.H{"user": user})
+		context.JSON(http.StatusOK, gin.H{"user": userModel})
 	} else {
 		context.JSON(http.StatusUnauthorized, gin.H{"response": "password does not match username"})
 	}
-
 }
 
 func UpdatePhoneNumber(context *gin.Context) {
