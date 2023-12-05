@@ -1,98 +1,95 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/ajg/form"
 	"github.com/carlosokumu/dubbedapi/database"
-	"github.com/carlosokumu/dubbedapi/models"
-	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/carlosokumu/dubbedapi/emailmethods"
+	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/carlosokumu/dubbedapi/stringmethods"
+	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-
+	"gorm.io/gorm"
 )
 
 // global variable
 var (
-Trader models.User
+	Trader models.User
 )
-
 
 func RegisterUser(context *gin.Context) {
 	var user models.User
 	var userModel models.UserModel
-	//var Token string
-
-	fmt.Println("REQUESTURL:", context.Request.URL)
-
 	d := form.NewDecoder(context.Request.Body)
-
 	if err := d.Decode(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
 		log.Fatal(err)
 		context.Abort()
 		return
 	}
-	username:= user.Username
-	email:= user.Email
-	password:= user.Password
+	username := user.Username
+	email := user.Email
+	password := user.Password
+	if err := database.Instance.Table("user_models").Where("user_name = ?", username).Or("email = ? ", email).First(&userModel).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if usernamelength := stringmethods.Charactercount(username); usernamelength < 4 {
+				context.JSON(http.StatusBadRequest, gin.H{"username error": "username should be more of 4 or more characters"})
+			} else if emailformatcredibility, _ := emailmethods.Emailformatverifier(email); !emailformatcredibility {
+				context.JSON(http.StatusBadRequest, gin.H{"email error": "email address is invalid"})
+			} else if passwordlength := stringmethods.Charactercount(password); passwordlength < 8 {
+				context.JSON(http.StatusBadRequest, gin.H{"password error": "password is weak or invalid"})
+			} else {
 
-	_ = database.Instance.Table("user_models").Where("username",username).First(&userModel)
+				if err := user.HashPassword(); err != nil {
+					context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
+					context.Abort()
+					log.Fatal(err)
+					return
+				}
 
-	if(userModel.UserName != ""){
-	   context.JSON(http.StatusNotAcceptable, gin.H{"username error":"provided username already exists"})
-	}
+				//Create a new userModel entity
+				userModel = models.UserModel{
+					UserName: user.Username,
+					Email:    user.Email,
+					Password: user.Password,
+				}
 
-	
-	
-	if usernamelength:=stringmethods.Charactercount(username); usernamelength < 4 {
-		context.JSON(http.StatusBadRequest, gin.H{"username error":"username should be more of 4 or more characters"})
-	} else if emailformatcredibility, _:= emailmethods.Emailformatverifier(email); !emailformatcredibility{
-		context.JSON(http.StatusBadRequest, gin.H{"email error":"email address is invalid"})
-	} else if passwordlength:=stringmethods.Charactercount(password); passwordlength < 8 {
-		context.JSON(http.StatusBadRequest, gin.H{"password error":"password is weak or invalid"})
+				record := database.Instance.Create(&userModel)
+				if record.Error != nil {
+					context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+					context.Abort()
+					return
+				}
+
+				_, tokenError := token.GenerateJWT(user.Email, user.Username)
+				if tokenError != nil {
+					fmt.Println("failed to generate token:", tokenError)
+					context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": tokenError})
+					return
+				}
+
+				context.JSON(http.StatusCreated, gin.H{"user": models.User{
+					Username: user.Username,
+					Email:    user.Email,
+					Password: user.Password,
+				}},
+				)
+			}
+		} else {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			context.Abort()
+			return
+		}
 	} else {
-	
-	if err := user.HashPassword(); err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"Internal server error": err.Error()})
-		context.Abort()
-		log.Fatal(err)
-		return
-	}
-
-	
-	//Create a new userModel entity
-	userModel = models.UserModel {
-		UserName: user.Username,
-		Email: user.Email,
-		Password: user.Password,
-	}
-
-	record := database.Instance.Create(&userModel)
-	if record.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+		context.JSON(http.StatusOK, gin.H{"error": "Provided username or email already exists"})
 		context.Abort()
 		return
 	}
-
-	_, tokenError := token.GenerateJWT(user.Email, user.Username)
-	if tokenError != nil {
-		fmt.Println("failed to generate token:", tokenError)
-		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": tokenError})
-		return
-	}
-
-	context.JSON(http.StatusCreated, gin.H{"user": models.User{
-		Username:               user.Username,
-		Email:                  user.Email,
-		Password:               user.Password,
-	}},
-	)
-}
 }
 
 func LoginUser(context *gin.Context) {
@@ -227,8 +224,8 @@ func GetUserInfo(context *gin.Context) {
 }
 
 func EmailPassword(context *gin.Context) {
-     var user models.EmailPassword
-	 fmt.Println("REQUESTURL:", context.Request.URL)
+	var user models.EmailPassword
+	fmt.Println("REQUESTURL:", context.Request.URL)
 
 	d := form.NewDecoder(context.Request.Body)
 
@@ -238,53 +235,53 @@ func EmailPassword(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	email:=user.Email
-	password:=user.Password
-	
-	if emailformatcredibility, _:= emailmethods.Emailformatverifier(email); !emailformatcredibility{
-		context.JSON(http.StatusBadRequest, gin.H{"email error":"email address is invalid"})
-	} else if passwordlength:=stringmethods.Charactercount(password); passwordlength < 8 {
-		context.JSON(http.StatusBadRequest, gin.H{"password error":"password is weak or invalid"})
+	email := user.Email
+	password := user.Password
+
+	if emailformatcredibility, _ := emailmethods.Emailformatverifier(email); !emailformatcredibility {
+		context.JSON(http.StatusBadRequest, gin.H{"email error": "email address is invalid"})
+	} else if passwordlength := stringmethods.Charactercount(password); passwordlength < 8 {
+		context.JSON(http.StatusBadRequest, gin.H{"password error": "password is weak or invalid"})
 	} else {
-	context.JSON(http.StatusCreated, gin.H{"user": models.EmailPassword{
-		Email:                  user.Email,
-		Password:               user.Password,
-	}},
-	)
-}
+		context.JSON(http.StatusCreated, gin.H{"user": models.EmailPassword{
+			Email:    user.Email,
+			Password: user.Password,
+		}},
+		)
+	}
 }
 func Access_refresh_token_accout_id_secret(context *gin.Context) {
 	var user models.AccessRefreshaccountsecret
 	fmt.Println("REQUESTURL:", context.Request.URL)
 
-   d := form.NewDecoder(context.Request.Body)
+	d := form.NewDecoder(context.Request.Body)
 
-   if err := d.Decode(&user); err != nil {
-	   context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-	   log.Fatal(err)
-	   context.Abort()
-	   return
-   }
-   access:=user.AccessToken
-   refresh:=user.RefreshToken
-   client_id:= user.Client_id
-   secret:=user.Secret
-   
-   if length:=stringmethods.Charactercount(access); length < 10 {
-	   context.JSON(http.StatusBadRequest, gin.H{"error":"empty access token"})
-   } else if length:=stringmethods.Charactercount(refresh); length < 10 {
-	context.JSON(http.StatusBadRequest, gin.H{"error":"empty refresh token"})
-   } else if length:=stringmethods.Charactercount(client_id); length < 1 {
-	context.JSON(http.StatusBadRequest, gin.H{"error":"empty account_id"})
-   }else if length:=stringmethods.Charactercount(secret); length < 10 {
-	context.JSON(http.StatusBadRequest, gin.H{"error":"empty secret"})
-   } else {
-   context.JSON(http.StatusCreated, gin.H{"user": models.AccessRefreshaccountsecret{
-	   AccessToken:                 user.AccessToken,
-	   RefreshToken:                user.RefreshToken,
-	   Client_id:             user.Client_id,
-	   Secret:                 user.Secret,
-   }},
-   )
-}
+	if err := d.Decode(&user); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
+		log.Fatal(err)
+		context.Abort()
+		return
+	}
+	access := user.AccessToken
+	refresh := user.RefreshToken
+	client_id := user.Client_id
+	secret := user.Secret
+
+	if length := stringmethods.Charactercount(access); length < 10 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "empty access token"})
+	} else if length := stringmethods.Charactercount(refresh); length < 10 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "empty refresh token"})
+	} else if length := stringmethods.Charactercount(client_id); length < 1 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "empty account_id"})
+	} else if length := stringmethods.Charactercount(secret); length < 10 {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "empty secret"})
+	} else {
+		context.JSON(http.StatusCreated, gin.H{"user": models.AccessRefreshaccountsecret{
+			AccessToken:  user.AccessToken,
+			RefreshToken: user.RefreshToken,
+			Client_id:    user.Client_id,
+			Secret:       user.Secret,
+		}},
+		)
+	}
 }
