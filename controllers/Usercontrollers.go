@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/ajg/form"
 	"github.com/carlosokumu/dubbedapi/database"
@@ -123,6 +125,51 @@ func LoginUser(context *gin.Context) {
 	} else {
 		context.JSON(http.StatusUnauthorized, gin.H{"response": "password does not match username"})
 	}
+}
+
+type PaginationData struct {
+	NextPage     int
+	PreviousPage *int
+	CurrentPage  int
+	HasMore      bool
+}
+
+func GetAllUsers(context *gin.Context) {
+	var users []models.UserModel
+	var totalRows int64
+	pageStr := context.Query("page")
+	page, _ := strconv.Atoi(pageStr)
+	PageSize := 5
+	fmt.Println("Page:", page)
+	offset := (page - 1) * PageSize
+
+	//Calculate total pages
+	database.Instance.Table("user_models").Model(&models.UserModel{}).Count(&totalRows)
+	totalPages := float64(totalRows / int64(PageSize))
+
+	result := database.Instance.Table("user_models").Limit(PageSize).Offset(offset).Find(&users)
+	if result.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"server error": result.Error})
+	}
+
+	context.JSON(http.StatusOK, gin.H{"users": users, "pagination": PaginationData{
+		CurrentPage: page,
+		NextPage:    page + 1,
+		PreviousPage: func() *int {
+			if page <= 1 {
+				return nil
+			}
+			previouspage := page - 1
+			return &previouspage
+		}(),
+		HasMore: IsLastPage(page, int(totalPages), PageSize),
+	},
+	})
+}
+
+func IsLastPage(currentPage, totalRecords, pageSize int) bool {
+	totalPages := int(math.Ceil(float64(totalRecords) / float64(pageSize)))
+	return currentPage == totalPages
 }
 
 func UpdatePhoneNumber(context *gin.Context) {
