@@ -298,7 +298,11 @@ func EmailPassword(context *gin.Context) {
 }
 func Access_refresh_token_accout_id_secret(context *gin.Context) {
 	var user models.AccessRefreshaccountsecret
+	var userModel models.UserModel
 	fmt.Println("REQUESTURL:", context.Request.URL)
+
+	queryParams := context.Request.URL.Query()
+	username := queryParams.Get("username")
 
 	d := form.NewDecoder(context.Request.Body)
 
@@ -322,28 +326,22 @@ func Access_refresh_token_accout_id_secret(context *gin.Context) {
 	} else if length := stringmethods.Charactercount(secret); length < 10 {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "empty secret"})
 	} else {
-		context.JSON(http.StatusCreated, gin.H{"user": models.AccessRefreshaccountsecret{
-			AccessToken:  user.AccessToken,
-			RefreshToken: user.RefreshToken,
-			Client_id:    user.Client_id,
-			Secret:       user.Secret,
-		}},
-		)
+		if result := database.Instance.Table("user_models").Model(&userModel).Select("AccessToken", "Secret", "RefreshToken").Where("user_name = ?", username).Updates(map[string]interface{}{"AccessToken": access, "Secret": secret, "RefreshToken": refresh}); result.Error != nil {
+			log.Fatal(result.Error)
+			fmt.Println("Cannot find User")
+		}
+		
+		context.JSON(http.StatusCreated, gin.H{"user": userModel})
 	}
 }
 func GetSpecificUser(context *gin.Context) {
 
-	var username models.Userdetailsaccessor
 	var userModel models.UserModel
-
-	d := form.NewDecoder(context.Request.Body)
-	if err := d.Decode(&username); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-		log.Fatal(err)
-		context.Abort()
-		return
-	}
-	if result := database.Instance.Table("user_models").Where("user_name = ?", username.Username).First(&userModel).Error; result != nil {
+	queryParams := context.Request.URL.Query()
+	username := queryParams.Get("username")
+	
+	fmt.Println(username)
+	if result := database.Instance.Table("user_models").Where("user_name = ?", username).First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
@@ -356,17 +354,11 @@ func GetSpecificUser(context *gin.Context) {
 
 func DeleteSpecificUser(context *gin.Context) {
 
-	var username models.Userdetailsaccessor
 	var userModel models.UserModel
-
-	d := form.NewDecoder(context.Request.Body)
-	if err := d.Decode(&username); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-		log.Fatal(err)
-		context.Abort()
-		return
-	}
-	if result := database.Instance.Table("user_models").Where("user_name = ?", username.Username).Delete(&userModel).Error; result != nil {
+    queryParams := context.Request.URL.Query()
+	username := queryParams.Get("username")
+	
+	if result := database.Instance.Table("user_models").Where("user_name = ?", username).Delete(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
 		context.Abort()
