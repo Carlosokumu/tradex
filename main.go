@@ -4,6 +4,7 @@ import (
 	//	"os"
 
 	"net/http"
+	"os"
 
 	"github.com/carlosokumu/dubbedapi/chat"
 	"github.com/carlosokumu/dubbedapi/controllers"
@@ -15,14 +16,12 @@ import (
 func main() {
 
 	//Connect to Postgres and migrate for the schemas
-	//databaseUrl := os.Getenv("DATABASE_URL")
-	databaseUrl := "postgres://swingwizards_users_user:U84u2BM2lRGFIoCArcrIxtYaLQ3fhBmd@dpg-clk1dveg1b2c739f9rqg-a.oregon-postgres.render.com/swingwizards_users"
+	databaseUrl := os.Getenv("DATABASE_URL")
+	//databaseUrl := "postgres://swingwizards_users_user:U84u2BM2lRGFIoCArcrIxtYaLQ3fhBmd@dpg-clk1dveg1b2c739f9rqg-a.oregon-postgres.render.com/swingwizards_users"
 	database.Connect(databaseUrl)
 	database.Migrate()
-
 	router := initRouter()
-	//port := os.Getenv("PORT")
-	port := ":8080"
+	port := os.Getenv("PORT")
 	router.Run(port)
 
 }
@@ -62,7 +61,7 @@ func initRouter() *gin.Engine {
 		api.POST("/positiondata/add", controllers.InsertPositionData)
 		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 		api.GET("/positions/all", controllers.GetOpenPositions)
-		api.PATCH("/users", controllers.GetAllUsers)
+		api.GET("/users", controllers.GetAllUsers)
 		api.POST("/user/login", controllers.LoginUser)
 		api.POST("/user/email", controllers.SendOtp)
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
