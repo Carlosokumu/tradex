@@ -22,7 +22,7 @@ func main() {
 
 	router := initRouter()
 	//port := os.Getenv("PORT")
-	port := ":4000"
+	port := ":8080"
 	router.Run(port)
 
 }
