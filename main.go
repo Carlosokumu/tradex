@@ -68,7 +68,7 @@ func initRouter() *gin.Engine {
 		api.GET("/user/userinfo", controllers.GetUserInfo)
 		api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
 		api.POST("/user/emailpassword", controllers.EmailPassword)
-		api.POST("/user/accessrefreshaccoutsecret", controllers.Access_refresh_token_accout_id_secret)
+		api.PATCH("/user/accessrefreshaccoutsecret", controllers.Access_refresh_token_accout_id_secret)
 		api.GET("/user/getspecificuser", controllers.GetSpecificUser)
 		api.DELETE("/user/deletespecificuser", controllers.DeleteSpecificUser)
 	}
