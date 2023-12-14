@@ -16,31 +16,30 @@ import (
 )
 
 type User struct {
-	Username               string     `form:"username"`
-	Email                  string     `form:"email"`
-	Password               string      `form:"password"`
+	Username string `form:"username"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
 }
 
-
-type UserModel  struct {
+type UserModel struct {
 	gorm.Model
-	UserName string
-    Email  string
-	Password  string
-    Avatar   string
+	UserName       string
+	Email          string
+	Password       string
+	Avatar         string
 	TradingAccount []TradingAccount `gorm:"foreignKey:UserID"`
-	AccessToken string
-	Secret string
-	RefreshToken string
+	AccessToken    string
+	AccountId      string
+	Secret         string
+	RefreshToken   string
 }
 
 type TradingAccount struct {
-   gorm.Model
-   Platform string
-   AccountId string
-   UserID    string
+	gorm.Model
+	Platform  string
+	AccountId string
+	UserID    string
 }
-
 
 type RunningPosition struct {
 	gorm.Model
