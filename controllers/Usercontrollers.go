@@ -34,7 +34,7 @@ func RegisterUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	username := user.Username
+	username := user.UserName
 	email := user.Email
 	password := user.Password
 	if err := database.Instance.Table("user_models").Where("user_name = ?", username).Or("email = ? ", email).First(&userModel).Error; err != nil {
@@ -56,7 +56,7 @@ func RegisterUser(context *gin.Context) {
 
 				//Create a new userModel entity
 				userModel = models.UserModel{
-					UserName: user.Username,
+					UserName: user.UserName,
 					Email:    user.Email,
 					Password: user.Password,
 				}
@@ -68,7 +68,7 @@ func RegisterUser(context *gin.Context) {
 					return
 				}
 
-				_, tokenError := token.GenerateJWT(user.Email, user.Username)
+				_, tokenError := token.GenerateJWT(user.Email, user.UserName)
 				if tokenError != nil {
 					fmt.Println("failed to generate token:", tokenError)
 					context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": tokenError})
@@ -76,7 +76,7 @@ func RegisterUser(context *gin.Context) {
 				}
 
 				context.JSON(http.StatusCreated, gin.H{"user": models.User{
-					Username: user.Username,
+					UserName: user.UserName,
 					Email:    user.Email,
 					Password: user.Password,
 				}},
@@ -288,7 +288,7 @@ func Access_refresh_token_accout_id_secret(context *gin.Context) {
 			log.Fatal(result.Error)
 			fmt.Println("Cannot find User")
 		}
-		
+
 		context.JSON(http.StatusCreated, gin.H{"user": userModel})
 	}
 }
@@ -297,7 +297,7 @@ func GetSpecificUser(context *gin.Context) {
 	var userModel models.UserModel
 	queryParams := context.Request.URL.Query()
 	username := queryParams.Get("username")
-	
+
 	fmt.Println(username)
 	if result := database.Instance.Table("user_models").Where("user_name = ?", username).First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
@@ -313,9 +313,9 @@ func GetSpecificUser(context *gin.Context) {
 func DeleteSpecificUser(context *gin.Context) {
 
 	var userModel models.UserModel
-    queryParams := context.Request.URL.Query()
+	queryParams := context.Request.URL.Query()
 	username := queryParams.Get("username")
-	
+
 	if result := database.Instance.Table("user_models").Where("user_name = ?", username).Delete(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		fmt.Println(result)
