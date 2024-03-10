@@ -10,6 +10,7 @@ import (
 
 	"github.com/ajg/form"
 	"github.com/carlosokumu/dubbedapi/database"
+	"github.com/carlosokumu/dubbedapi/dtos"
 	"github.com/carlosokumu/dubbedapi/emailmethods"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/carlosokumu/dubbedapi/stringmethods"
@@ -67,7 +68,6 @@ func RegisterUser(context *gin.Context) {
 					context.Abort()
 					return
 				}
-
 				_, tokenError := token.GenerateJWT(user.Email, user.UserName)
 				if tokenError != nil {
 					fmt.Println("failed to generate token:", tokenError)
@@ -147,7 +147,7 @@ func GetAllUsers(context *gin.Context) {
 	database.Instance.Table("user_models").Model(&models.UserModel{}).Count(&totalRows)
 	totalPages := float64(totalRows / int64(PageSize))
 
-	result := database.Instance.Table("user_models").Limit(PageSize).Offset(offset).Find(&users)
+	result := database.Instance.Table("user_models").Preload("TradingAccounts").Limit(PageSize).Offset(offset).Find(&users)
 	if result.Error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"server error": result.Error})
 	}
@@ -188,6 +188,42 @@ func UpdatePhoneNumber(context *gin.Context) {
 		fmt.Println("Cannot find User")
 	}
 	context.JSON(http.StatusOK, gin.H{"response": "Phone Number updated Sucessfully"})
+}
+
+func UpdateTradingAccount(context *gin.Context) {
+
+	var tradingAccountDTO dtos.TradingAccountDTO
+	var userModel models.UserModel
+
+	// Bind JSON data from the request body to DTO
+	if err := context.ShouldBindJSON(&tradingAccountDTO); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Please check your fields"})
+		return
+	}
+
+	if result := database.Instance.Table("user_models").Where("user_name = ?", tradingAccountDTO.UserName).First(&userModel).Error; result != nil {
+		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
+		fmt.Println(result)
+		context.Abort()
+		return
+	} else {
+		context.JSON(http.StatusOK, gin.H{"user": userModel})
+	}
+
+	// Convert DTO to GORM entity
+	tradingAccount := models.TradingAccount{
+		Platform:  tradingAccountDTO.Platform,
+		AccountId: tradingAccountDTO.AccountId,
+		UserId:    userModel.ID,
+	}
+
+	record := database.Instance.Create(&tradingAccount)
+	if record.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+		context.Abort()
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"trading_account": tradingAccount})
 }
 
 func SendConfirmEmail(context *gin.Context) {
