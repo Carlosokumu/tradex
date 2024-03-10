@@ -1,8 +1,6 @@
 package main
 
 import (
-	//	"os"
-
 	"net/http"
 	"os"
 
@@ -61,6 +59,7 @@ func initRouter() *gin.Engine {
 		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
 		api.GET("/positions/all", controllers.GetOpenPositions)
 		api.GET("/users", controllers.GetAllUsers)
+		api.PATCH("/user/tradingaccount", controllers.UpdateTradingAccount)
 		api.POST("/user/login", controllers.LoginUser)
 		api.POST("/user/email", controllers.SendOtp)
 		api.POST("/user/confirmation", controllers.SendConfirmEmail)
