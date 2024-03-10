@@ -23,22 +23,22 @@ type User struct {
 
 type UserModel struct {
 	gorm.Model
-	UserName       string
-	Email          string
-	Password       string
-	Avatar         string
-	TradingAccount []TradingAccount `gorm:"foreignKey:UserID"`
-	AccessToken    string
-	AccountId      string
-	Secret         string
-	RefreshToken   string
+	UserName        string
+	Email           string
+	Password        string
+	Avatar          string
+	TradingAccounts []TradingAccount `gorm:"foreignKey:UserId"`
+	AccessToken     string
+	AccountId       string
+	Secret          string
+	RefreshToken    string
 }
 
 type TradingAccount struct {
 	gorm.Model
 	Platform  string
 	AccountId string
-	UserID    string
+	UserId    uint
 }
 
 type RunningPosition struct {
