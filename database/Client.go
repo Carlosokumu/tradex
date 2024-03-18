@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/carlosokumu/dubbedapi/models"
@@ -26,10 +27,41 @@ func Migrate() {
 	err := Instance.AutoMigrate(
 		&models.UserModel{},
 		&models.TradingAccount{},
+		&models.Role{},
 	)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+	SeedRoles()
 	log.Println("Database Migration Completed!")
+}
+
+func SeedRoles() {
+
+	//User Role
+	userRole := models.Role{
+		Name: "TradeShareUser",
+	}
+	// Trader Role
+	traderRole := models.Role{
+		Name: "TradeShareTrader",
+	}
+	//Admin Role
+	adminRole := models.Role{
+		Name: "TraderShareAdmin",
+	}
+
+	roles := []models.Role{userRole, traderRole, adminRole}
+
+	for _, role := range roles {
+		record := Instance.Create(&role)
+		if record.Error != nil {
+			log.Fatal("Failed to seed roles:", record.Error)
+			return
+		}
+	}
+
+	fmt.Println("Successfully initialized roles")
+
 }
