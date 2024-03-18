@@ -66,18 +66,51 @@ func ValidateTraderRoleJWT(context *gin.Context) error {
 	return errors.New("invalid author token provided")
 }
 
+// validate Admin JWT token
+func ValidateAdminRoleJWT(context *gin.Context) error {
+	token, err := getToken(context)
+	if err != nil {
+		return err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	userRole := uint(claims["role"].(float64))
+	if ok && token.Valid && userRole == 3 {
+		return nil
+	}
+	return errors.New("invalid author token provided")
+}
+
 // check for a valid trader token
 func JWTAuthTrader() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		err := ValidateJWT(context)
 		if err != nil {
-			context.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+			context.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required.Please check your token and try again"})
 			context.Abort()
 			return
 		}
 		error := ValidateTraderRoleJWT(context)
 		if error != nil {
 			context.JSON(http.StatusUnauthorized, gin.H{"error": "Only verified  traders are allowed to perform this action"})
+			context.Abort()
+			return
+		}
+		context.Next()
+	}
+}
+
+// check for admin valid token
+func JWTAuthAdmin() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		err := ValidateJWT(context)
+		if err != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required.Please check your token and try again"})
+			context.Abort()
+			return
+		}
+		error := ValidateAdminRoleJWT(context)
+		if error != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{"error": "You do not have permission to perform this actions"})
 			context.Abort()
 			return
 		}
