@@ -7,7 +7,7 @@ import (
 	"github.com/carlosokumu/dubbedapi/chat"
 	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/carlosokumu/dubbedapi/database"
-	"github.com/carlosokumu/dubbedapi/verification"
+	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +19,7 @@ func main() {
 	database.Migrate()
 	router := initRouter()
 	port := os.Getenv("PORT")
+
 	router.Run(port)
 
 }
@@ -49,26 +50,25 @@ func initRouter() *gin.Engine {
 		controllers.ReadBotEndpoint(c.Writer, c.Request)
 	})
 
-	//----------
+	authRoutes := router.Group("/auth/user")
+	// registration route
+	authRoutes.POST("/register", controllers.RegisterUser)
+	authRoutes.PATCH("/login", controllers.LoginUser)
 
-	api := router.Group("/tradex")
-	{
+	//Admin route
+	adminRotes := router.Group("/admin")
+	adminRotes.Use(token.JWTAuthAdmin())
+	adminRotes.POST("/verify/trader", controllers.VerifyTrader)
 
-		api.POST("/user/register", controllers.RegisterUser)
-		api.POST("/positiondata/add", controllers.InsertPositionData)
-		api.PATCH("/user/phonenumber", controllers.UpdatePhoneNumber)
-		api.GET("/positions/all", controllers.GetOpenPositions)
-		api.GET("/users", controllers.GetAllUsers)
-		api.PATCH("/user/tradingaccount", controllers.UpdateTradingAccount)
-		api.POST("/user/login", controllers.LoginUser)
-		api.POST("/user/email", controllers.SendOtp)
-		api.POST("/user/confirmation", controllers.SendConfirmEmail)
-		api.GET("/user/verifytoken", verification.IsAuthorized(verification.UserIndex))
-		api.POST("/user/emailpassword", controllers.EmailPassword)
-		api.PATCH("/user/accessrefreshaccoutsecret", controllers.Access_refresh_token_accout_id_secret)
-		api.GET("/user/getspecificuser", controllers.GetSpecificUser)
-		api.DELETE("/user/deletespecificuser", controllers.DeleteSpecificUser)
-	}
+	//public user level access routes
+	publicUserRoutes := router.Group("/api/v1/user")
+	publicUserRoutes.GET("/traders", controllers.GetTraders)
+
+	//protected trader access level  routes
+	protectedTraderRoutes := router.Group("/api/v1/trader")
+	protectedTraderRoutes.Use(token.JWTAuthTrader())
+	protectedTraderRoutes.GET("/connect", controllers.ConnectTradingAccount)
+
 	return router
 }
 
