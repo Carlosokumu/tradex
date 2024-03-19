@@ -32,6 +32,8 @@ type UserModel struct {
 	AccountId       string
 	Secret          string
 	RefreshToken    string
+	RoleID          uint
+	Role            Role
 }
 
 type TradingAccount struct {
@@ -39,6 +41,11 @@ type TradingAccount struct {
 	Platform  string
 	AccountId string
 	UserId    uint
+}
+
+type Role struct {
+	gorm.Model
+	Name string
 }
 
 type RunningPosition struct {
@@ -62,6 +69,15 @@ func (user *User) HashPassword() error {
 		return err
 	}
 	user.Password = string(bytes)
+	return nil
+}
+
+func (userModel *UserModel) HashPassword() error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(userModel.Password), 14)
+	if err != nil {
+		return err
+	}
+	userModel.Password = string(bytes)
 	return nil
 }
 
@@ -163,7 +179,7 @@ func (user *User) GetMtAccountBalance() (*Mt4Account, error) {
 
 	/**
 		    Fetch data from Mt4 api through nodejs sdk  provided.
-	        Will switch to RabbitMq to make responses  fast.
+	        Will switch to a message broker to make responses  faster.
 	*/
 	req, err := http.NewRequest("GET", "https://mt4functions.herokuapp.com/account", nil)
 
