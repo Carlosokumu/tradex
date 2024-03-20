@@ -32,7 +32,7 @@ func RegisterUser(context *gin.Context) {
 	var userDto dtos.UserDto
 
 	if err := context.ShouldBind(&userDto); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err})
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -63,7 +63,7 @@ func RegisterUser(context *gin.Context) {
 
 	record := database.Instance.Create(&userModel)
 	if record.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"Database Error": record.Error.Error()})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": record.Error.Error()})
 		context.Abort()
 		return
 	}
@@ -76,7 +76,7 @@ func RegisterUser(context *gin.Context) {
 
 	if tokenError != nil {
 		fmt.Println("failed to generate token:", tokenError)
-		context.JSON(http.StatusInternalServerError, gin.H{"Token generation Error": tokenError})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": tokenError})
 		return
 	}
 
@@ -89,33 +89,39 @@ func RegisterUser(context *gin.Context) {
 }
 
 func LoginUser(context *gin.Context) {
-	var credentials models.Credentials
 	var userModel models.UserModel
+	var UserLoginDto dtos.UserLoginDto
 
-	d := form.NewDecoder(context.Request.Body)
-	if err := d.Decode(&credentials); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"Parse Error": err.Error()})
-		log.Fatal(err)
-		context.Abort()
+	if err := context.ShouldBind(&UserLoginDto); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if result := database.Instance.Table("user_models").Where("user_name = ?", credentials.UserName).First(&userModel).Error; result != nil {
+	if result := database.Instance.Table("user_models").Where("user_name = ?", UserLoginDto.UserName).Preload("TradingAccounts").Preload("Role").First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
-		context.Abort()
 		return
 	}
-	_, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 14)
+	_, err := bcrypt.GenerateFromPassword([]byte(UserLoginDto.Password), 14)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"response": err})
-		context.Abort()
 		return
 	}
-	result := CheckPasswordHash(credentials.Password, userModel.Password)
+	result := CheckPasswordHash(UserLoginDto.Password, userModel.Password)
+
+	token, tokenError := token.GenerateJWTWithUserModel(models.UserModel{
+		UserName: userModel.UserName,
+		Password: userModel.Password,
+		RoleID:   userModel.RoleID,
+	})
+
+	if tokenError != nil {
+		fmt.Println("failed to generate token:", tokenError)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": tokenError})
+		return
+	}
 
 	if result {
-		context.JSON(http.StatusOK, gin.H{"user": userModel})
+		context.JSON(http.StatusOK, gin.H{"user": userModel, "token": token})
 	} else {
 		context.JSON(http.StatusUnauthorized, gin.H{"response": "password does not match username"})
 	}
