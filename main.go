@@ -12,8 +12,6 @@ import (
 )
 
 func main() {
-
-	//Connect to Postgres and migrate for the schemas
 	databaseUrl := os.Getenv("DATABASE_URL")
 	database.Connect(databaseUrl)
 	database.Migrate()
@@ -53,7 +51,7 @@ func initRouter() *gin.Engine {
 	authRoutes := router.Group("/auth/user")
 	// registration route
 	authRoutes.POST("/register", controllers.RegisterUser)
-	authRoutes.PATCH("/login", controllers.LoginUser)
+	authRoutes.POST("/login", controllers.LoginUser)
 
 	//Admin route
 	adminRotes := router.Group("/admin")
