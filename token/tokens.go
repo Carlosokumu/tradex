@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/carlosokumu/dubbedapi/models"
+	"github.com/carlosokumu/dubbedapi/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -74,7 +75,7 @@ func ValidateAdminRoleJWT(context *gin.Context) error {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	userRole := uint(claims["role"].(float64))
-	if ok && token.Valid && userRole == 3 {
+	if ok && token.Valid && userRole == utils.ADMIN {
 		return nil
 	}
 	return errors.New("invalid author token provided")
