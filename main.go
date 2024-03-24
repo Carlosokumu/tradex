@@ -65,7 +65,7 @@ func initRouter() *gin.Engine {
 	//protected trader access level  routes
 	protectedTraderRoutes := router.Group("/api/v1/trader")
 	protectedTraderRoutes.Use(token.JWTAuthTrader())
-	protectedTraderRoutes.GET("/connect", controllers.ConnectTradingAccount)
+	protectedTraderRoutes.PATCH("/connect", controllers.ConnectTradingAccount)
 
 	return router
 }
