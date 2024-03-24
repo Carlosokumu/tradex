@@ -61,7 +61,7 @@ func ValidateTraderRoleJWT(context *gin.Context) error {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	userRole := uint(claims["role"].(float64))
-	if ok && token.Valid && userRole == 2 || userRole == 1 {
+	if ok && token.Valid && userRole == 2 {
 		return nil
 	}
 	return errors.New("invalid author token provided")
