@@ -35,10 +35,6 @@ func initRouter() *gin.Engine {
 	router.Use(allowAllDomains())
 	router.LoadHTMLGlob("html/*")
 
-	router.GET("/rascamps", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "rascampsprivacy.html", nil)
-	})
-
 	//[Websocket] Endpoindts ------
 	router.GET("/ws", func(c *gin.Context) {
 		chat.ServeWs(hub, c.Writer, c.Request)
