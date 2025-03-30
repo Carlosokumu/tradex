@@ -140,7 +140,6 @@ func GetAllUsers(context *gin.Context) {
 	pageStr := context.Query("page")
 	page, _ := strconv.Atoi(pageStr)
 	PageSize := 5
-	fmt.Println("Page:", page)
 	offset := (page - 1) * PageSize
 
 	//Calculate total pages
@@ -231,7 +230,6 @@ func UpdatePhoneNumber(context *gin.Context) {
 
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", phoneinfo.UserName).Update("phone_number", phoneinfo.PhoneNumber); result.Error != nil {
 		log.Fatal(result.Error)
-		fmt.Println("Cannot find User")
 	}
 	context.JSON(http.StatusOK, gin.H{"response": "Phone Number updated Sucessfully"})
 }
@@ -310,7 +308,6 @@ func SendOtp(context *gin.Context) {
 
 func EmailPassword(context *gin.Context) {
 	var user models.EmailPassword
-	fmt.Println("REQUESTURL:", context.Request.URL)
 	d := form.NewDecoder(context.Request.Body)
 
 	if err := d.Decode(&user); err != nil {
@@ -339,7 +336,6 @@ func EmailPassword(context *gin.Context) {
 func Access_refresh_token_accout_id_secret(context *gin.Context) {
 	var user models.AccessRefreshaccountsecret
 	var userModel models.UserModel
-	fmt.Println("REQUESTURL:", context.Request.URL)
 
 	queryParams := context.Request.URL.Query()
 	username := queryParams.Get("username")
