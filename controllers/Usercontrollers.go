@@ -56,7 +56,6 @@ func RegisterUser(context *gin.Context) {
 	if err := userModel.HashPassword(); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
-		log.Fatal(err)
 		return
 	}
 
@@ -74,7 +73,7 @@ func RegisterUser(context *gin.Context) {
 	})
 
 	if tokenError != nil {
-		fmt.Println("failed to generate token:", tokenError)
+		log.Printf("failed to generate token %v:", tokenError)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": tokenError})
 		return
 	}
@@ -114,7 +113,7 @@ func LoginUser(context *gin.Context) {
 	})
 
 	if tokenError != nil {
-		fmt.Println("failed to generate token:", tokenError)
+		log.Printf("failed to generate token: %v", tokenError)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": tokenError})
 		return
 	}
@@ -228,7 +227,7 @@ func UpdatePhoneNumber(context *gin.Context) {
 	}
 
 	if result := database.Instance.Table("users").Model(&models.User{}).Where("username = ?", phoneinfo.UserName).Update("phone_number", phoneinfo.PhoneNumber); result.Error != nil {
-		log.Fatal(result.Error)
+		log.Printf("Failed to update phone number: %v", result.Error)
 	}
 	context.JSON(http.StatusOK, gin.H{"response": "Phone Number updated Sucessfully"})
 }
@@ -362,8 +361,7 @@ func Access_refresh_token_accout_id_secret(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "empty secret"})
 	} else {
 		if result := database.Instance.Table("user_models").Model(&userModel).Select("AccessToken", "Secret", "RefreshToken").Where("user_name = ?", username).Updates(map[string]interface{}{"AccessToken": access, "Secret": secret, "RefreshToken": refresh}); result.Error != nil {
-			log.Fatal(result.Error)
-			fmt.Println("Cannot find User")
+			log.Print(result.Error)
 		}
 
 		context.JSON(http.StatusCreated, gin.H{"user": userModel})
@@ -378,7 +376,6 @@ func GetSpecificUser(context *gin.Context) {
 	fmt.Println(username)
 	if result := database.Instance.Table("user_models").Where("user_name = ?", username).First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
 		context.Abort()
 		return
 	} else {
@@ -395,7 +392,6 @@ func DeleteSpecificUser(context *gin.Context) {
 
 	if result := database.Instance.Table("user_models").Where("user_name = ?", username).Delete(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
-		fmt.Println(result)
 		context.Abort()
 		return
 	} else {
