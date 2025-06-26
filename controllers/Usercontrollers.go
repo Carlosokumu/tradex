@@ -26,7 +26,6 @@ var (
 )
 
 func RegisterUser(context *gin.Context) {
-	//var user models.User
 	var userModel models.UserModel
 
 	var userDto dtos.UserDto
@@ -44,7 +43,7 @@ func RegisterUser(context *gin.Context) {
 
 	// Check if username or email already exists
 	if userExists := checkUserExists(userDto.UserName, userDto.Email); userExists {
-		context.JSON(http.StatusConflict, gin.H{"error": "Provided username  already exists"})
+		context.JSON(http.StatusConflict, gin.H{"error": "Provided username or email  already exists"})
 		return
 	}
 
