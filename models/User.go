@@ -28,12 +28,9 @@ type UserModel struct {
 	Password        string
 	Avatar          string
 	TradingAccounts []TradingAccount `gorm:"foreignKey:UserId"`
-	AccessToken     string
-	AccountId       string
-	Secret          string
-	RefreshToken    string
 	RoleID          uint
 	Role            Role
+	Communities     []Community `gorm:"many2many:user_communities;"`
 }
 
 type TradingAccount struct {
@@ -215,7 +212,5 @@ func (user *User) GetMtAccountBalance() (*Mt4Account, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(mt4account.Balance)
 	return &mt4account, nil
 }
