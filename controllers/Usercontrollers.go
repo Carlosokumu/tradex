@@ -373,7 +373,6 @@ func GetSpecificUser(context *gin.Context) {
 	queryParams := context.Request.URL.Query()
 	username := queryParams.Get("username")
 
-	fmt.Println(username)
 	if result := database.Instance.Table("user_models").Where("user_name = ?", username).First(&userModel).Error; result != nil {
 		context.JSON(http.StatusNotFound, gin.H{"response": result.Error()})
 		context.Abort()

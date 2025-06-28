@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -9,9 +10,14 @@ import (
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
 	databaseUrl := os.Getenv("DATABASE_URL")
 	database.Connect(databaseUrl)
 	database.Migrate()
@@ -57,11 +63,15 @@ func initRouter() *gin.Engine {
 	//public user level access routes
 	publicUserRoutes := router.Group("/api/v1/user")
 	publicUserRoutes.GET("/traders", controllers.GetTraders)
+	publicUserRoutes.PATCH("/community/join", controllers.AddNewMemberToCommunity)
+	publicUserRoutes.GET("/communities", controllers.GetAllCommunities)
+	publicUserRoutes.GET("/community", controllers.GetCommunityByName)
 
 	//protected trader access level  routes
 	protectedTraderRoutes := router.Group("/api/v1/trader")
 	protectedTraderRoutes.Use(token.JWTAuthTrader())
 	protectedTraderRoutes.GET("/connect", controllers.ConnectTradingAccount)
+	authRoutes.POST("/community/create", controllers.CreateCommunity)
 
 	return router
 }

@@ -28,6 +28,11 @@ func Migrate() {
 		&models.UserModel{},
 		&models.TradingAccount{},
 		&models.Role{},
+		&models.Community{},
+		&models.Post{},
+		&models.Comment{},
+		&models.Like{},
+		&models.CommunityMember{},
 	)
 
 	if err != nil {
