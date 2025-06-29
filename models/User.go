@@ -30,6 +30,7 @@ type UserModel struct {
 	TradingAccounts []TradingAccount `gorm:"foreignKey:UserId"`
 	RoleID          uint
 	Role            Role
+	Token           string      `gorm:"size:1024"`
 	Communities     []Community `gorm:"many2many:user_communities;"`
 }
 
