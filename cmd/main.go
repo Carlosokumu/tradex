@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -14,13 +15,31 @@ import (
 )
 
 func main() {
+	migrate := flag.Bool("migrate", false, "Run database migrations")
+	createSuperUser := flag.Bool("create-superuser", false, "Create a superuser account")
+	flag.Parse()
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
+
 	databaseUrl := os.Getenv("DATABASE_URL")
 	database.Connect(databaseUrl)
-	database.Migrate()
+
+	if *migrate {
+		log.Println("Running database migrations...")
+		database.Migrate()
+	}
+
+	if *createSuperUser {
+		log.Println("Creating superuser account...")
+		_, err := database.CreateSuperUser()
+		if err != nil {
+			log.Fatal("Failed to create superuser:", err)
+		}
+		log.Println("Superuser created successfully")
+	}
 	router := initRouter()
 	port := os.Getenv("PORT")
 
@@ -50,13 +69,13 @@ func initRouter() *gin.Engine {
 		controllers.ReadBotEndpoint(c.Writer, c.Request)
 	})
 
-	authRoutes := router.Group("/auth/user")
+	authRoutes := router.Group("api/v1/auth/user")
 	// registration route
 	authRoutes.POST("/register", controllers.RegisterUser)
 	authRoutes.POST("/login", controllers.LoginUser)
 
 	//Admin route
-	adminRotes := router.Group("/admin")
+	adminRotes := router.Group("api/v1/admin")
 	adminRotes.Use(token.JWTAuthAdmin())
 	adminRotes.POST("/verify/trader", controllers.VerifyTrader)
 
@@ -71,7 +90,7 @@ func initRouter() *gin.Engine {
 	protectedTraderRoutes := router.Group("/api/v1/trader")
 	protectedTraderRoutes.Use(token.JWTAuthTrader())
 	protectedTraderRoutes.GET("/connect", controllers.ConnectTradingAccount)
-	authRoutes.POST("/community/create", controllers.CreateCommunity)
+	protectedTraderRoutes.POST("/community/create", controllers.CreateCommunity)
 
 	return router
 }
