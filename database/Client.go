@@ -1,10 +1,15 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"os"
 
+	"github.com/carlosokumu/dubbedapi/dtos"
 	"github.com/carlosokumu/dubbedapi/models"
+	"github.com/carlosokumu/dubbedapi/token"
+	"github.com/carlosokumu/dubbedapi/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -63,10 +68,87 @@ func SeedRoles() {
 		record := Instance.Create(&role)
 		if record.Error != nil {
 			log.Fatal("Failed to seed roles:", record.Error)
-			return
 		}
 	}
 
 	fmt.Println("Successfully initialized roles")
 
+}
+
+func CreateSuperUser() (string, error) {
+	superUsername := os.Getenv("SUPER_USER_USERNAME")
+	superUserPassword := os.Getenv("SUPER_USER_PASSWORD")
+	superUserEmail := os.Getenv("SUPER_USER_EMAIL")
+
+	userdto := dtos.UserDto{
+		UserName: superUsername,
+		Email:    superUserEmail,
+		Password: superUserPassword,
+	}
+
+	err := utils.ValidateUserInput(&userdto)
+	if err != nil {
+		log.Printf("Failed to validate super user details: %v", err)
+		return "", err
+	}
+
+	if superUsername == "" || superUserPassword == "" || superUserEmail == "" {
+		return "", fmt.Errorf("superuser credentials must be set in environment variables")
+	}
+
+	tx := Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var existingUser models.UserModel
+	if err := tx.Where("user_name = ? OR role_id = ?", superUsername, utils.ADMIN).First(&existingUser).Error; err == nil {
+		tx.Rollback()
+		return "", fmt.Errorf("superuser already exists")
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		tx.Rollback()
+		return "", fmt.Errorf("database error: %v", err)
+	}
+
+	hashedPassword, err := utils.HashPassword(superUserPassword)
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to hash password: %v", err)
+	}
+
+	// Generate JWT
+	token, err := token.GenerateJWTWithUserModel(models.UserModel{
+		UserName: superUsername,
+		Email:    superUserEmail,
+		Password: string(hashedPassword),
+		RoleID:   utils.ADMIN,
+	})
+	if err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to generate token: %v", err)
+	}
+
+	// Create super user
+	superUser := models.UserModel{
+		UserName: superUsername,
+		Email:    superUserEmail,
+		Password: string(hashedPassword),
+		RoleID:   utils.ADMIN,
+		Token:    token,
+	}
+
+	if err := tx.Create(&superUser).Error; err != nil {
+		tx.Rollback()
+		return "", fmt.Errorf("failed to create user: %v", err)
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return "", fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	log.Printf("Superuser account created for %s", superUsername)
+
+	return token, nil
 }
