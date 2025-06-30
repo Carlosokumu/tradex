@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"math"
 	"net/http"
@@ -9,9 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/carlosokumu/dubbedapi/config"
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/dtos"
 	"github.com/carlosokumu/dubbedapi/models"
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -224,6 +228,113 @@ func GetAllCommunities(c *gin.Context) {
 	})
 }
 
+// PostToCommunity  allow sharing  posts to communities
+func PostToCommunity(ctx *gin.Context) {
+	var pstToCommunityDto dtos.PostToCommunityDto
+
+	err := ctx.ShouldBind(&pstToCommunityDto)
+	if err != nil {
+		log.Printf("Invalid request payload: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid request payload",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	cld, err := cloudinary.NewFromParams(
+		config.CloudinaryCloudName,
+		config.CloudinaryAPIKey,
+		config.CloudinaryAPISecret,
+	)
+
+	if err != nil {
+		log.Printf("Failed to initialize cloudinary: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to initialize Cloudinary"})
+		return
+	}
+
+	tx := database.Instance.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var user models.UserModel
+	if err := tx.Where("user_name = ?", pstToCommunityDto.Username).First(&user).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": "user not found",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to check user",
+		})
+		return
+	}
+
+	var community models.Community
+	if err := tx.Where("name = ?", pstToCommunityDto.CommunityName).First(&community).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"error": "community not found",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to check community",
+		})
+		return
+	}
+
+	ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, 2<<20) // 2MB
+
+	file, _, err := ctx.Request.FormFile("image")
+	if err != nil {
+		log.Printf("Error processing image: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file or size > 2MB"})
+		return
+	}
+	defer file.Close()
+
+	uploadResult, err := cld.Upload.Upload(
+		ctx.Request.Context(),
+		file,
+		uploader.UploadParams{
+			PublicID: fmt.Sprintf("%s_%d", community.Name, time.Now().Unix()),
+			Folder:   "community_uploads",
+		},
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Upload failed: %v", err)})
+		return
+	}
+
+	post := models.Post{
+		Content:     pstToCommunityDto.Content,
+		ImageURL:    uploadResult.SecureURL,
+		PosterID:    user.ID,
+		CommunityID: community.ID,
+	}
+	if err := tx.Create(&post).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create post: " + err.Error()})
+		return
+	}
+
+	tx.Commit()
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Post created successfully",
+		"post_id": post.ID,
+		"image":   uploadResult.SecureURL,
+	})
+}
+
 // AddNewMemberToCommunity adds a new member to a  community
 func AddNewMemberToCommunity(ctx *gin.Context) {
 	var joinCommunityDto dtos.JoinCommunityDto
@@ -320,15 +431,22 @@ func GetCommunityByName(c *gin.Context) {
 	}
 
 	var community models.Community
-
 	err := database.Instance.
 		Select("id", "name", "description", "admin_id", "created_at").
 		Where("name = ?", communityName).
 		Preload("Members", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "user_name", "avatar")
 		}).
-		First(&community).
-		Error
+		Preload("Posts", func(db *gorm.DB) *gorm.DB {
+			return db.Select(
+				"id",
+				"content",
+				"poster_id",
+				"community_id",
+				"created_at",
+				"image_url",
+			).Order("created_at DESC").Limit(20)
+		}).First(&community).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -352,6 +470,7 @@ func GetCommunityByName(c *gin.Context) {
 		Description string             `json:"description"`
 		MemberCount int                `json:"member_count"`
 		Members     []models.UserModel `json:"members"`
+		Posts       []models.Post      `json:"posts"`
 	}
 
 	response := CommunityResponse{
@@ -360,6 +479,7 @@ func GetCommunityByName(c *gin.Context) {
 		Description: community.Description,
 		MemberCount: len(community.Members),
 		Members:     community.Members,
+		Posts:       community.Posts,
 	}
 
 	c.JSON(http.StatusOK, gin.H{
