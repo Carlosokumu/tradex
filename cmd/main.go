@@ -7,25 +7,20 @@ import (
 	"os"
 
 	"github.com/carlosokumu/dubbedapi/chat"
+	"github.com/carlosokumu/dubbedapi/config"
 	"github.com/carlosokumu/dubbedapi/controllers"
 	"github.com/carlosokumu/dubbedapi/database"
 	"github.com/carlosokumu/dubbedapi/token"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
+	config.LoadEnv()
 	migrate := flag.Bool("migrate", false, "Run database migrations")
 	createSuperUser := flag.Bool("create-superuser", false, "Create a superuser account")
 	flag.Parse()
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
-	}
-
-	databaseUrl := os.Getenv("DATABASE_URL")
-	database.Connect(databaseUrl)
+	database.Connect(config.DbUrl)
 
 	if *migrate {
 		log.Println("Running database migrations...")
@@ -91,6 +86,7 @@ func initRouter() *gin.Engine {
 	protectedTraderRoutes.Use(token.JWTAuthTrader())
 	protectedTraderRoutes.GET("/connect", controllers.ConnectTradingAccount)
 	protectedTraderRoutes.POST("/community/create", controllers.CreateCommunity)
+	protectedTraderRoutes.POST("/community/post", controllers.PostToCommunity)
 
 	return router
 }

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 
+	"github.com/carlosokumu/dubbedapi/config"
 	"github.com/carlosokumu/dubbedapi/dtos"
 	"github.com/carlosokumu/dubbedapi/models"
 	"github.com/carlosokumu/dubbedapi/token"
@@ -76,24 +76,17 @@ func SeedRoles() {
 }
 
 func CreateSuperUser() (string, error) {
-	superUsername := os.Getenv("SUPER_USER_USERNAME")
-	superUserPassword := os.Getenv("SUPER_USER_PASSWORD")
-	superUserEmail := os.Getenv("SUPER_USER_EMAIL")
 
 	userdto := dtos.UserDto{
-		UserName: superUsername,
-		Email:    superUserEmail,
-		Password: superUserPassword,
+		UserName: config.SuperUsername,
+		Email:    config.SuperUserEmail,
+		Password: config.SuperUserPassword,
 	}
 
 	err := utils.ValidateUserInput(&userdto)
 	if err != nil {
 		log.Printf("Failed to validate super user details: %v", err)
 		return "", err
-	}
-
-	if superUsername == "" || superUserPassword == "" || superUserEmail == "" {
-		return "", fmt.Errorf("superuser credentials must be set in environment variables")
 	}
 
 	tx := Instance.Begin()
@@ -104,7 +97,7 @@ func CreateSuperUser() (string, error) {
 	}()
 
 	var existingUser models.UserModel
-	if err := tx.Where("user_name = ? OR role_id = ?", superUsername, utils.ADMIN).First(&existingUser).Error; err == nil {
+	if err := tx.Where("user_name = ? OR role_id = ?", userdto.UserName, utils.ADMIN).First(&existingUser).Error; err == nil {
 		tx.Rollback()
 		return "", fmt.Errorf("superuser already exists")
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -112,7 +105,7 @@ func CreateSuperUser() (string, error) {
 		return "", fmt.Errorf("database error: %v", err)
 	}
 
-	hashedPassword, err := utils.HashPassword(superUserPassword)
+	hashedPassword, err := utils.HashPassword(userdto.Password)
 	if err != nil {
 		tx.Rollback()
 		return "", fmt.Errorf("failed to hash password: %v", err)
@@ -120,8 +113,8 @@ func CreateSuperUser() (string, error) {
 
 	// Generate JWT
 	token, err := token.GenerateJWTWithUserModel(models.UserModel{
-		UserName: superUsername,
-		Email:    superUserEmail,
+		UserName: userdto.UserName,
+		Email:    userdto.Email,
 		Password: string(hashedPassword),
 		RoleID:   utils.ADMIN,
 	})
@@ -132,8 +125,8 @@ func CreateSuperUser() (string, error) {
 
 	// Create super user
 	superUser := models.UserModel{
-		UserName: superUsername,
-		Email:    superUserEmail,
+		UserName: userdto.UserName,
+		Email:    userdto.Email,
 		Password: string(hashedPassword),
 		RoleID:   utils.ADMIN,
 		Token:    token,
@@ -148,7 +141,7 @@ func CreateSuperUser() (string, error) {
 		return "", fmt.Errorf("failed to commit transaction: %v", err)
 	}
 
-	log.Printf("Superuser account created for %s", superUsername)
+	log.Printf("Superuser account created for %s", userdto.UserName)
 
 	return token, nil
 }
